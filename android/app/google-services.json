@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "941945451696",
+    "project_id": "banana-e83bf",
+    "storage_bucket": "banana-e83bf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941945451696:android:8ee92aa04166701d41f775",
+        "android_client_info": {
+          "package_name": "com.example.banana"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfijPaNCEB9ddz4ZYNgvVDOIZewoOKkDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

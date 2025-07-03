@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'banana-e83bf.firebasestorage.app',
     measurementId: 'G-B0RWY1L9DJ',
   );
+
 }

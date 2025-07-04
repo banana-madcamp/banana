@@ -1,4 +1,5 @@
 import 'package:banana/main/main_bottom_navigation_bar.dart';
+import 'package:banana/main/main_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';

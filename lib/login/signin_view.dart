@@ -1,3 +1,5 @@
+import 'package:banana/utils/values/app_colors.dart';
+import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/material.dart';
 
 class SigninView extends StatefulWidget {
@@ -30,7 +32,7 @@ class _SigninViewState extends State<SigninView> {
               const SizedBox(height: 60),
               const Text("Sign In", style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600),),
               const SizedBox(height: 5,),
-              Container(height: 2, width:50, color: Color(0xFFFF8383),),
+              Container(height: 2, width:50, color: Color(AppColors.primary),),
               const SizedBox(height: 24),
 
               const Text("Email", style: TextStyle(fontWeight:FontWeight.w600),),
@@ -38,12 +40,12 @@ class _SigninViewState extends State<SigninView> {
                 controller: emailController,
                 decoration: const InputDecoration(
                   hintText: "enter your email",
-                  prefixIcon: Icon(Icons.email_outlined),
+                  prefixIcon: Icon(AppIcons.email),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFBDBDBD), width: 2), 
+                    borderSide: BorderSide(color: Color(AppColors.gray), width: 2), 
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFFF8383), width: 2), 
+                    borderSide: BorderSide(color: Color(AppColors.primary), width: 2), 
                   ),
                 ),
                 validator: (value) {
@@ -60,10 +62,10 @@ class _SigninViewState extends State<SigninView> {
                 obscureText: _isObscured,
                 decoration: const InputDecoration(
                   hintText: "enter your password",
-                  prefixIcon: Icon(Icons.lock_outline_rounded),
+                  prefixIcon: Icon(AppIcons.password),
                   suffixIcon: IconButton(
-                    onPressed: onPressed, 
-                    icon: Icon(_isObscured ? Icons.visibility_off : Icons.visibility_outlined))
+                    onPressed: () => setState(() => _isObscured = !_isObscured), 
+                    icon: Icon(_isObscured ? AppIcons.invisible : AppIcons.visible))
                 ),
               ),
             ],

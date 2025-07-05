@@ -1,4 +1,5 @@
 import 'package:banana/main/views/main_view.dart';
+import 'package:banana/splash/views/splash_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'firebase_options.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MainView(),
+      home: const SplashView(),
     );
   }
 }

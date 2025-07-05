@@ -70,7 +70,12 @@ class _MainViewState extends State<MainView>
           Get.bottomSheet(
             MainProductAddView(),
             isScrollControlled: true,
-            backgroundColor: Colors.transparent,
+            backgroundColor: AppColors.transparent,
+            barrierColor: AppColors.transparent,
+            enterBottomSheetDuration: const Duration(milliseconds: 200),
+            exitBottomSheetDuration: const Duration(milliseconds: 200),
+            elevation: 0,
+            ignoreSafeArea: false
           );
         },
       ),

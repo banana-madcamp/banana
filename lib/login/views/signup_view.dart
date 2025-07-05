@@ -1,10 +1,14 @@
 import 'package:banana/login/datas/local/user_database_data_source_dummy.dart';
 import 'package:banana/login/datas/source/user_database_source.dart';
+import 'package:banana/main/views/main_view.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:banana/login/models/user.dart';
+import 'package:get/get.dart';
+
+import 'signin_view.dart';
 
 final UserDatabaseSource userDB = UserDatabaseSourceDummy();
 
@@ -182,7 +186,9 @@ class _SignupViewState extends State<SignupView> {
 
                     await userDB.addUser(newUser);
 
-                    Navigator.pop(context);
+                    Get.off(() => const MainView(),
+                      transition: Transition.rightToLeftWithFade,
+                      duration: const Duration(milliseconds: 200));
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -211,7 +217,9 @@ class _SignupViewState extends State<SignupView> {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pop(context);
+                            Get.off(() => const SigninView(),
+                              transition: Transition.rightToLeftWithFade,
+                              duration: const Duration(milliseconds: 200));
                           }
                         ),
                       ],

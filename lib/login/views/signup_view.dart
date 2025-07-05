@@ -1,7 +1,12 @@
+import 'package:banana/login/datas/local/user_database_data_source_dummy.dart';
+import 'package:banana/login/datas/source/user_database_source.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:banana/login/models/user.dart';
+
+final UserDatabaseSource userDB = UserDatabaseSourceDummy();
 
 class SignupView extends StatefulWidget {
   const SignupView({super.key});
@@ -156,8 +161,29 @@ class _SignupViewState extends State<SignupView> {
 
                 const SizedBox(height: 40),
 
-                ElevatedButton(onPressed: () {
-                  if (_formKey.currentState!.validate()) {}
+                ElevatedButton(onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    final nickname = nicknameController.text;
+                    final email = emailController.text;
+                    final password = passwordController.text;
+
+                    final newUser  = User(
+                      userId: DateTime.now().millisecondsSinceEpoch.toString(),
+                      email: email,
+                      password: password,
+                      nickname: nickname,
+                      profileImageUrl: '',
+                      location: '',
+                      address: '',
+                      orderHistory: [],
+                      sellingProducts: [],
+                      paymentMethods: [],
+                    );
+
+                    await userDB.addUser(newUser);
+
+                    Navigator.pop(context);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

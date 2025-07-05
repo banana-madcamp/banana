@@ -1,7 +1,11 @@
+import 'package:banana/login/datas/local/user_database_data_source_dummy.dart';
+import 'package:banana/login/datas/source/user_database_source.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
+final UserDatabaseSource userDB = UserDatabaseSourceDummy();
 
 class SigninView extends StatefulWidget {
   const SigninView({super.key});
@@ -118,8 +122,23 @@ class _SigninViewState extends State<SigninView> {
               const SizedBox(height: 40),
 
               ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {}
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    final email = emailController.text;
+                    final password = passwordController.text;
+
+                    final user = await userDB.findUser(email, password);
+
+                    if(user!= null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("${user.nickname}님, 로그인 성공 !")),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("이메일 또는 비밀번호가 일치하지 않습니다")),
+                      );
+                    }
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

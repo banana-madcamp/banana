@@ -48,14 +48,19 @@ class _TagSearchDialogState extends State<TagSearchDialog> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                        backgroundColor: AppColors.primary.withValues(
+                          alpha: 0.2,
+                        ),
                         side: BorderSide(color: AppColors.primary),
-                        label: Text(tag ?? '', style: TextStyle(
-                          color: AppColors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'Rubik'
-                        ),),
+                        label: Text(
+                          tag ?? '',
+                          style: TextStyle(
+                            color: AppColors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Rubik',
+                          ),
+                        ),
                         onDeleted: () {
                           setState(() {
                             selectedTags.remove(tag);
@@ -119,6 +124,8 @@ class _TagSearchDialogState extends State<TagSearchDialog> {
                 ),
               ),
               Expanded(child: Container()),
+              Text('Please tab suggestions to add tags.'),
+              const SizedBox(height: 10),
               MainBottomButton(
                 onPressed: () {
                   Get.back(result: selectedTags);

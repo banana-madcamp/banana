@@ -5,7 +5,9 @@ abstract class DatabaseSource {
   Future<List<Product>> fetchData();
 
   /// Saves the data to the backend.
-  Future<void> saveData();
+  Future<void> uploadProduct(Product product);
+
+  Future<List<String>> uploadImages(List<String> imagePaths);
 
   /// Deletes the data from the backend.
   Future<void> deleteData();

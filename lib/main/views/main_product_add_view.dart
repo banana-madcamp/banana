@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:banana/main/datas/source/database_source.dart';
+import 'package:banana/main/models/product.dart';
+import 'package:banana/main/models/product_information_image.dart';
 import 'package:banana/main/views/main_bottom_button.dart';
 import 'package:banana/main/views/tag_item_list.dart';
 import 'package:banana/utils/values/app_colors.dart';
@@ -8,12 +11,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 
+import '../datas/local/tags.dart';
+import '../models/information_validator.dart';
 import 'aspect_radio_video.dart';
 
 class MainProductAddView extends StatefulWidget {
@@ -30,11 +36,14 @@ class _MainProductAddViewState extends State<MainProductAddView> {
   final priceController = TextEditingController();
   final tradingAreaController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  final List<XFile> _images = [];
+  final List<ProductInformationImage> _productImages = [];
   int? _thumbnailIndex;
   final GlobalKey<AnimatedListState> _imageListKey =
       GlobalKey<AnimatedListState>();
   final log = Get.find<Logger>(tag: 'MainLogger');
+  final List<String> _tags = Get.find<List<String>>(tag: 'SelectedTags');
+
+  DatabaseSource get _db => Get.find<DatabaseSource>();
 
   @override
   void initState() {
@@ -43,6 +52,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
 
   Widget titleTextField() {
     return TextFormField(
+      validator: InformationValidator.validateTitle,
       controller: titleController,
       decoration: InputDecoration(
         labelStyle: TextStyle(
@@ -58,6 +68,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
 
   Widget subTitleTextField() {
     return TextFormField(
+      validator: InformationValidator.validateSubtitle,
       decoration: InputDecoration(
         labelStyle: TextStyle(
           fontSize: 14,
@@ -77,6 +88,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
         borderRadius: BorderRadius.circular(5),
       ),
       child: TextFormField(
+        validator: InformationValidator.validateDescription,
         controller: descriptionController,
         maxLines: 5,
         decoration: InputDecoration(
@@ -97,6 +109,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
 
   Widget priceTextField() {
     return TextFormField(
+      validator: InformationValidator.validatePrice,
       controller: priceController,
       decoration: InputDecoration(
         isDense: true,
@@ -122,18 +135,12 @@ class _MainProductAddViewState extends State<MainProductAddView> {
           borderSide: BorderSide(color: AppColors.primary, width: 2),
         ),
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'please enter your price';
-        if ((!value.isNum) || ((int.tryParse(value) ?? -1) < 0)) {
-          return 'it is not a valid number';
-        }
-        return null;
-      },
     );
   }
 
   Widget tradingAreaTextField() {
     return TextFormField(
+      validator: InformationValidator.validateLocation,
       controller: tradingAreaController,
       decoration: InputDecoration(
         isDense: true,
@@ -159,13 +166,6 @@ class _MainProductAddViewState extends State<MainProductAddView> {
           borderSide: BorderSide(color: AppColors.primary, width: 2),
         ),
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'please enter your price';
-        if ((!value.isNum) || ((int.tryParse(value) ?? -1) < 0)) {
-          return 'it is not a valid number';
-        }
-        return null;
-      },
     );
   }
 
@@ -290,7 +290,64 @@ class _MainProductAddViewState extends State<MainProductAddView> {
             ),
             tradingAreaTextField(),
             Expanded(child: Container()),
-            MainBottomButton(onPressed: () {}, text: "LIST A PRODUCT"),
+            MainBottomButton(
+              onPressed: () {
+                InformationValidator()
+                    .validateTags(
+                      _productImages
+                          .map(
+                            (image) =>
+                                InputImage.fromFilePath(image.image.path),
+                          )
+                          .toList(),
+                    )
+                    .then((tags) {
+                      List<int> errorIndexes = [];
+                      final List<String> convertedTags =
+                          _tags.map((e) => Tags().getEnglishTag(e)).toList();
+                      for (int i = 0; i < tags.length; i++) {
+                        bool isValid = false;
+                        for (String tag in tags[i]) {
+                          if (convertedTags.contains(tag)) {
+                            isValid = true;
+                            break;
+                          }
+                        }
+                        if (!isValid) {
+                          errorIndexes.add(i);
+                        }
+                      }
+                      if (errorIndexes.isEmpty) {
+                        log.i("submit");
+                        upload();
+                      } else {
+                        log.e("Invalid tags at indexes: $errorIndexes");
+                        setState(() {
+                          for (int index in errorIndexes) {
+                            _productImages[index].isValid = false;
+                          }
+                        });
+                        Get.dialog(
+                          CupertinoAlertDialog(
+                            title: Text("Invalid Tags"),
+                            content: Text(
+                              "Please ensure that all images have valid tags : $tags",
+                            ),
+                            actions: [
+                              CupertinoDialogAction(
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                child: Text("OK"),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    });
+              },
+              text: "LIST A PRODUCT",
+            ),
             SizedBox(height: 20),
           ],
         ),
@@ -320,7 +377,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
       height: 64,
       child: AnimatedList.separated(
         key: _imageListKey,
-        initialItemCount: _images.length,
+        initialItemCount: _productImages.length,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index, animation) {
           return ScaleTransition(
@@ -330,7 +387,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
                 end: 1.0,
               ).chain(CurveTween(curve: Curves.easeInOut)),
             ),
-            child: imageItemContainer(_images[index], index),
+            child: imageItemContainer(_productImages[index], index),
           );
         },
         separatorBuilder: (
@@ -351,19 +408,19 @@ class _MainProductAddViewState extends State<MainProductAddView> {
     );
   }
 
-  Widget imageItemContainer(XFile image, int index) {
-    final String? mime = lookupMimeType(image.path);
+  Widget imageItemContainer(ProductInformationImage productImage, int index) {
+    final String? mime = lookupMimeType(productImage.image.path);
 
     return kIsWeb
-        ? Image.network(image.path)
+        ? Image.network(productImage.image.path)
         : (mime == null || mime.startsWith('image/')
             ? (_thumbnailIndex != null && _thumbnailIndex == index)
-                ? thumbnailImageItem(child: imageItem(image, index))
-                : imageItem(image, index)
+                ? thumbnailImageItem(child: imageItem(productImage, index))
+                : imageItem(productImage, index)
             : _buildInlineVideoPlayer(index));
   }
 
-  Widget imageItem(XFile image, int index) {
+  Widget imageItem(ProductInformationImage productImage, int index) {
     return Stack(
       children: [
         GestureDetector(
@@ -378,7 +435,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
               fit: BoxFit.fitHeight,
               width: 64,
               height: 64,
-              File(image.path),
+              File(productImage.image.path),
               errorBuilder: (context, error, stackTrace) {
                 return Container(
                   decoration: BoxDecoration(
@@ -408,7 +465,8 @@ class _MainProductAddViewState extends State<MainProductAddView> {
                   _thumbnailIndex = _thumbnailIndex! - 1;
                 }
               }
-              final XFile removedImage = _images.removeAt(index);
+              final ProductInformationImage removedImage = _productImages
+                  .removeAt(index);
               _imageListKey.currentState!.removeItem(index, (
                 context,
                 animation,
@@ -422,7 +480,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
                   )..addStatusListener((state) {
                     if (state == AnimationStatus.completed ||
                         state == AnimationStatus.dismissed) {
-                      if (_images.isNotEmpty && targetIndex != null) {
+                      if (_productImages.isNotEmpty && targetIndex != null) {
                         setState(() {
                           _thumbnailIndex = targetIndex;
                         });
@@ -438,6 +496,20 @@ class _MainProductAddViewState extends State<MainProductAddView> {
               padding: EdgeInsets.zero,
               minimumSize: Size(0, 0),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color:
+                    _productImages[index].isValid
+                        ? AppColors.transparent
+                        : AppColors.red.withValues(alpha: 0.8),
+                width: 2,
+              ),
             ),
           ),
         ),
@@ -472,7 +544,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
 
   Widget _buildInlineVideoPlayer(int index) {
     final VideoPlayerController controller = VideoPlayerController.file(
-      File(_images[index].path),
+      File(_productImages[index].image.path),
     );
     const double volume = kIsWeb ? 0.0 : 1.0;
     controller.setVolume(volume);
@@ -527,11 +599,14 @@ class _MainProductAddViewState extends State<MainProductAddView> {
         try {
           final List<XFile> images = await _picker.pickMultiImage();
           for (XFile image in images) {
-            int index = _images.isNotEmpty ? _images.length : 0;
-            _images.insert(index, image);
+            int index = _productImages.isNotEmpty ? _productImages.length : 0;
+            _productImages.insert(
+              index,
+              ProductInformationImage(isValid: true, image: image),
+            );
             _imageListKey.currentState!.insertItem(index);
           }
-          if (_thumbnailIndex == null && _images.isNotEmpty) {
+          if (_thumbnailIndex == null && _productImages.isNotEmpty) {
             setState(() {
               _thumbnailIndex = 0;
             });
@@ -541,5 +616,30 @@ class _MainProductAddViewState extends State<MainProductAddView> {
         }
       }
     };
+  }
+
+  Future<void> upload() async {
+    List<String> imageDownloadLinks = await _db.uploadImages(
+      _productImages.map((image) => image.image.path).toList(),
+    );
+    _db
+        .uploadProduct(
+          Product(
+            userId: "",
+            id: "",
+            title: titleController.text,
+            subTitle: subTitleController.text,
+            description: descriptionController.text,
+            price: double.tryParse(priceController.text) ?? 0.0,
+            tag: _tags,
+            location: tradingAreaController.text,
+            thumbnailImageUrl: imageDownloadLinks[_thumbnailIndex ?? 0],
+            createdAt: DateTime.now(),
+            imageUrls: imageDownloadLinks,
+          ),
+        )
+        .then((value) {
+          log.i("Product uploaded successfully");
+        });
   }
 }

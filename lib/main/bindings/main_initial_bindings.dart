@@ -12,5 +12,6 @@ class MainInitialBindings implements Bindings {
     Get.put<ImageLabeler>(
       ImageLabeler(options: ImageLabelerOptions(confidenceThreshold: 0.5)),
     );
+    Get.put<List<String>>([], tag: 'SelectedTags');
   }
 }

@@ -1,11 +1,9 @@
-import 'package:banana/main/datas/local/tags.dart';
 import 'package:banana/main/views/tag_search_dialog.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 
 class TagItemList extends StatefulWidget {
   const TagItemList({super.key});
@@ -15,9 +13,7 @@ class TagItemList extends StatefulWidget {
 }
 
 class _TagItemListState extends State<TagItemList> {
-  List<String> selectedTags = [];
-
-  ImageLabeler get imageLabeler => Get.find<ImageLabeler>();
+  final List<String> selectedTags = Get.find<List<String>>(tag: 'SelectedTags');
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +25,28 @@ class _TagItemListState extends State<TagItemList> {
           for (String tag in selectedTags)
             Padding(
               padding: const EdgeInsets.only(right: 2),
-              child: TagItem(tag: tag),
+              child: TagItem(tag: tag,
+                onPress: () {
+                  setState(() {
+                    selectedTags.remove(tag);
+                  });
+                },
+              ),
             ),
           AddTagItem(
             onPress: () async {
-              final result = await Get.to(() => TagSearchDialog());
+              final List<String> result = await Get.to(
+                () => TagSearchDialog(),
+                preventDuplicates: false,
+              );
+              final List<String> addTags = [];
+              for (var tag in result) {
+                if (!selectedTags.contains(tag)) {
+                  addTags.add(tag);
+                }
+              }
               setState(() {
-                selectedTags = result ?? [];
+                selectedTags.addAll(addTags);
               });
             },
           ),
@@ -46,27 +57,31 @@ class _TagItemListState extends State<TagItemList> {
 }
 
 class TagItem extends StatelessWidget {
-  String tag;
+  final String tag;
+  final VoidCallback onPress;
 
-  TagItem({super.key, required this.tag});
+  const TagItem({super.key, required this.tag, required this.onPress});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 47,
-      height: 19,
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Center(
-        child: Text(
-          "#$tag",
-          style: TextStyle(
-            fontSize: 10,
-            fontFamily: 'Rubik',
-            fontWeight: FontWeight.normal,
-            color: AppColors.gray,
+    return GestureDetector(
+      onTap: onPress,
+      child: Container(
+        width: 47,
+        height: 19,
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Center(
+          child: Text(
+            "#$tag",
+            style: TextStyle(
+              fontSize: 10,
+              fontFamily: 'Rubik',
+              fontWeight: FontWeight.normal,
+              color: AppColors.gray,
+            ),
           ),
         ),
       ),

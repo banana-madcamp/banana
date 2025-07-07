@@ -886,16 +886,21 @@ class Tags {
     tags.sort((a, b) {
       if (a.toLowerCase().contains(searchQuery.toLowerCase()) &&
           b.toLowerCase().contains(searchQuery.toLowerCase())) {
-        return a.toLowerCase().indexOf(searchQuery.toLowerCase())
-            .compareTo(b.toLowerCase().indexOf(searchQuery.toLowerCase()));
+        return a.length < b.length ? -1 : 1;
       } else if (a.toLowerCase().contains(searchQuery.toLowerCase())) {
         return -1;
       } else if (b.toLowerCase().contains(searchQuery.toLowerCase())) {
         return 1;
       }
       return 0;
-
     });
     return tags.sublist(0, number);
+  }
+
+  String getEnglishTag(String tag) {
+    List<String> tagsEn = getTags(locale: 'en');
+    List<String> tagsKo = getTags(locale: 'ko');
+    int index = tagsKo.indexOf(tag);
+    return tagsEn[index];
   }
 }

@@ -19,4 +19,9 @@ abstract class UserDatabaseSource {
   Future<void> addProduct(String userId, Product product);
 
   Future<void> updateUser(User updatedUser);
+
+  Future<User> getCurrentUser();
+  
+  // 로그아웃 메서드
+  Future<void> logout();
 }

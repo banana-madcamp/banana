@@ -45,7 +45,7 @@ class _SignupViewState extends State<SignupView> {
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text("Sign up",
-                    style: TextStyle(fontSize: 32, fontWeight:FontWeight.w700)),
+                    style: TextStyle(fontFamily: 'Rubik', fontSize: 38, fontWeight:FontWeight.w700)),
                 ),
                 const SizedBox(height: 6),
                 Align(
@@ -56,13 +56,13 @@ class _SignupViewState extends State<SignupView> {
 
                 const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("Nickname", style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text("Nickname", style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16)),
                 ),
                 TextFormField(
                   controller: nicknameController,
                   decoration: const InputDecoration(
                     hintText: "enter your nickname",
-                    hintStyle: TextStyle(color: AppColors.gray),
+                    hintStyle: TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
                     prefixIcon: Icon(AppIcons.profile, color: AppColors.gray),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: AppColors.gray, width: 1.5),
@@ -78,13 +78,13 @@ class _SignupViewState extends State<SignupView> {
 
                 const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("Email", style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text("Email", style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16)),
                 ),
                 TextFormField(
                   controller: emailController,
                   decoration: const InputDecoration(
                     hintText: "enter your email",
-                    hintStyle: TextStyle(color: AppColors.gray),
+                    hintStyle: TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
                     prefixIcon: Icon(AppIcons.email, color: AppColors.gray),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: AppColors.gray, width: 1.5),
@@ -103,14 +103,14 @@ class _SignupViewState extends State<SignupView> {
 
                 const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("Password", style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text("Password", style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16)),
                 ),
                 TextFormField(
                   controller: passwordController,
                   obscureText: _isObscured,
                   decoration: InputDecoration(
                     hintText: "enter your password",
-                    hintStyle: const TextStyle(color: AppColors.gray),
+                    hintStyle: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
                     prefixIcon: const Icon(AppIcons.password, color: AppColors.gray),
                     suffixIcon: IconButton(
                       onPressed: () => setState(() => _isObscured = !_isObscured),
@@ -131,14 +131,14 @@ class _SignupViewState extends State<SignupView> {
 
                 const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("Confirm Password", style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text("Confirm Password", style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16)),
                 ),
                 TextFormField(
                   controller: confirmController,
                   obscureText: _isConfirmObscured,
                   decoration: InputDecoration(
                     hintText: "confirm your password",
-                    hintStyle: const TextStyle(color: AppColors.gray),
+                    hintStyle: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
                     prefixIcon: const Icon(AppIcons.password, color: AppColors.gray),
                     suffixIcon: IconButton(
                       onPressed: () =>
@@ -193,13 +193,13 @@ class _SignupViewState extends State<SignupView> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  minimumSize: const Size.fromHeight(48),
+                  minimumSize: const Size.fromHeight(49),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
                 child: const Text("Create Account",
-                    style: TextStyle(color: AppColors.white)),
+                    style: TextStyle(fontFamily: 'Rubik', color: AppColors.white, fontSize: 18)),
               ),
               const SizedBox(height: 16),
 
@@ -207,13 +207,15 @@ class _SignupViewState extends State<SignupView> {
                 child: RichText(
                   text: TextSpan(
                     text: "Already have an account? ",
-                    style: const TextStyle(color: AppColors.gray),
+                    style: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
                     children: [
                       TextSpan(
                         text: "Login",
                         style: const TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          fontFamily: 'Rubik',
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {

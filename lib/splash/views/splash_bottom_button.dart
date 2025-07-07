@@ -1,5 +1,7 @@
+import 'package:banana/login/views/signin_view.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SplashBottomButton extends StatefulWidget {
   const SplashBottomButton({super.key});
@@ -22,7 +24,13 @@ class _SplashBottomButtonState extends State<SplashBottomButton> {
           maximumSize: Size(double.infinity, 49),
           minimumSize: Size(double.infinity, 49),
         ),
-        onPressed: () {},
+        onPressed: () {
+          Get.off(
+            () => const SigninView(),
+            transition: Transition.rightToLeftWithFade,
+            duration: const Duration(milliseconds: 500),
+          );
+        },
         child: Text(
           "Sign In",
           style: TextStyle(

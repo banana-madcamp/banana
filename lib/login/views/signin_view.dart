@@ -41,7 +41,7 @@ class _SigninViewState extends State<SigninView> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Sign In",
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontFamily: 'Rubik', fontSize: 38, fontWeight: FontWeight.w700),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -59,14 +59,14 @@ class _SigninViewState extends State<SigninView> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Email",
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16,),
                   ),
                 ),
                 TextFormField(
                   controller: emailController,
                   decoration: InputDecoration(
                     hintText: "enter your email",
-                    hintStyle: const TextStyle(color: AppColors.gray),
+                    hintStyle: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14,),
                     prefixIcon: const Icon(
                       AppIcons.email,
                       color: AppColors.gray,
@@ -93,7 +93,7 @@ class _SigninViewState extends State<SigninView> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Password",
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16),
                   ),
                 ),
                 TextFormField(
@@ -101,7 +101,7 @@ class _SigninViewState extends State<SigninView> {
                   obscureText: _isObscured,
                   decoration: InputDecoration(
                     hintText: "enter your password",
-                    hintStyle: const TextStyle(color: AppColors.gray),
+                    hintStyle: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
                     prefixIcon: const Icon(
                       AppIcons.password,
                       color: AppColors.gray,
@@ -143,7 +143,7 @@ class _SigninViewState extends State<SigninView> {
                     ),
                     const Text(
                       "Remember Me",
-                      style: TextStyle(fontWeight: FontWeight.w400),
+                      style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w400, fontSize: 12),
                     ),
                     const Spacer(),
                     TextButton(
@@ -151,8 +151,10 @@ class _SigninViewState extends State<SigninView> {
                       child: const Text(
                         "Forgot Password?",
                         style: TextStyle(
+                          fontFamily: 'Rubik',
                           color: AppColors.primary,
                           fontWeight: FontWeight.w400,
+                          fontSize: 12,
                         ),
                       ),
                     ),
@@ -183,14 +185,14 @@ class _SigninViewState extends State<SigninView> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    minimumSize: const Size.fromHeight(48),
+                    minimumSize: const Size.fromHeight(49),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
                   child: const Text(
                     "Login",
-                    style: TextStyle(color: AppColors.white),
+                    style: TextStyle(fontFamily: 'Rubik', color: AppColors.white, fontSize: 18),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -199,13 +201,15 @@ class _SigninViewState extends State<SigninView> {
                   child: RichText(
                     text: TextSpan(
                       text: "Don't have an account? ",
-                      style: const TextStyle(color: AppColors.gray),
+                      style: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
                       children: [
                         TextSpan(
                           text: "Sign up",
                           style: const TextStyle(
+                            fontFamily: 'Rubik',
                             color: AppColors.primary,
                             fontWeight: FontWeight.w400,
+                            fontSize: 14,
                           ),
                           recognizer:
                               TapGestureRecognizer()

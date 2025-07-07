@@ -1,3 +1,4 @@
+import 'package:banana/login/bindings/login_initial_bindings.dart';
 import 'package:banana/splash/views/splash_bottom_button.dart';
 import 'package:banana/utils/values/app_assets.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +16,12 @@ class SplashView extends StatefulWidget {
 }
 
 class _SplashViewState extends State<SplashView> {
+  @override
+  void initState(){
+    super.initState();
+    LoginInitialBindings().dependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(

@@ -1,6 +1,8 @@
 import 'package:banana/main/views/main_bottom_button.dart';
+import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 import '../../utils/values/app_colors.dart';
 import '../datas/local/tags.dart';
@@ -16,9 +18,12 @@ class _TagSearchDialogState extends State<TagSearchDialog> {
   bool isDark = false;
   final Tags tags = Tags();
   final List<String> selectedTags = [];
-  final List<String?> filteredTags = [];
+  List<String?> _filteredTags = [];
   final int maxSuggestions = 3;
   final String locale = 'ko';
+  final SearchController _searchController = SearchController();
+
+  Logger get log => Get.find<Logger>(tag: 'MainLogger');
 
   @override
   void initState() {
@@ -33,43 +38,6 @@ class _TagSearchDialogState extends State<TagSearchDialog> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              SearchAnchor.bar(
-                suggestionsBuilder: (
-                  BuildContext context,
-                  SearchController controller,
-                ) {
-                  controller.addListener(() {
-                    setState(() {
-                      filteredTags.clear();
-                      filteredTags.addAll(
-                        tags.compareItem(
-                          searchQuery: controller.text,
-                          number: maxSuggestions,
-                          locale: locale,
-                        ),
-                      );
-                    });
-                  });
-
-                  return [
-                    for (int i = 0; i < filteredTags.length; i++)
-                      if (filteredTags[i] != null)
-                        ListTile(
-                          title: Text(filteredTags[i]!),
-                          onTap: () {
-                            if (!selectedTags.contains(filteredTags[i]!)) {
-                              setState(() {
-                                selectedTags.add(filteredTags[i]!);
-                                controller.clear();
-                              });
-                            }
-                            controller.closeView(null);
-                          },
-                        ),
-                  ];
-                },
-              ),
-              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -77,8 +45,17 @@ class _TagSearchDialogState extends State<TagSearchDialog> {
                     Padding(
                       padding: const EdgeInsets.only(right: 2),
                       child: Chip(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.2),
                         side: BorderSide(color: AppColors.primary),
-                        label: Text(tag ?? ''),
+                        label: Text(tag ?? '', style: TextStyle(
+                          color: AppColors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Rubik'
+                        ),),
                         onDeleted: () {
                           setState(() {
                             selectedTags.remove(tag);
@@ -89,7 +66,59 @@ class _TagSearchDialogState extends State<TagSearchDialog> {
                     ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SearchBar(
+                controller: _searchController,
+                onChanged: (value) {
+                  if (value == "" || value.isEmpty) {
+                    return;
+                  }
+                  log.i('Search query: $value');
+                  final filteredTags = tags.compareItem(
+                    searchQuery: value,
+                    number: maxSuggestions,
+                    locale: locale,
+                  );
+                  log.i('Filtered tags: $filteredTags');
+
+                  setState(() {
+                    _filteredTags = filteredTags;
+                  });
+                },
+                leading: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(AppIcons.search),
+                ),
+                trailing: [
+                  IconButton(
+                    onPressed: () {
+                      _searchController.clear();
+                    },
+                    icon: Icon(AppIcons.close),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 200,
+                child: ListView(
+                  scrollDirection: Axis.vertical,
+                  children: [
+                    for (int i = 0; i < _filteredTags.length; i++)
+                      if (_filteredTags[i] != null)
+                        ListTile(
+                          title: Text(_filteredTags[i]!),
+                          onTap: () {
+                            if (!selectedTags.contains(_filteredTags[i]!)) {
+                              setState(() {
+                                selectedTags.add(_filteredTags[i]!);
+                                _searchController.clear();
+                              });
+                            }
+                          },
+                        ),
+                  ],
+                ),
+              ),
+              Expanded(child: Container()),
               MainBottomButton(
                 onPressed: () {
                   Get.back(result: selectedTags);

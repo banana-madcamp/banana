@@ -883,18 +883,14 @@ class Tags {
       return [for (int i = 0; i < number; i++) null];
     }
 
-    tags.sort((a, b) {
-      if (a.toLowerCase().contains(searchQuery.toLowerCase()) &&
-          b.toLowerCase().contains(searchQuery.toLowerCase())) {
-        return a.length < b.length ? -1 : 1;
-      } else if (a.toLowerCase().contains(searchQuery.toLowerCase())) {
-        return -1;
-      } else if (b.toLowerCase().contains(searchQuery.toLowerCase())) {
-        return 1;
+    final List<String> filteredTags = [];
+    for(String tag in tags) {
+      if (tag.toLowerCase().startsWith(searchQuery.toLowerCase())) {
+        filteredTags.add(tag);
       }
-      return 0;
-    });
-    return tags.sublist(0, number);
+    }
+
+    return filteredTags;
   }
 
   String getEnglishTag(String tag) {
@@ -902,5 +898,17 @@ class Tags {
     List<String> tagsKo = getTags(locale: 'ko');
     int index = tagsKo.indexOf(tag);
     return tagsEn[index];
+  }
+
+  int comparedWith(String a, String b, String target) {
+    if (a.startsWith(target) && b.startsWith(target)) {
+      return a.length < b.length ? -1 : 1;
+    } else if (a.startsWith(target)) {
+      return -1;
+    } else if (b.startsWith(target)) {
+      return 1;
+    } else {
+      return a.compareTo(b);
+    }
   }
 }

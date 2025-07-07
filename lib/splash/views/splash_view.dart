@@ -2,6 +2,7 @@ import 'package:banana/splash/views/splash_bottom_button.dart';
 import 'package:banana/utils/values/app_assets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../utils/values/app_colors.dart';
 
@@ -13,6 +14,11 @@ class SplashView extends StatefulWidget {
 }
 
 class _SplashViewState extends State<SplashView> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -36,7 +42,9 @@ class _SplashViewState extends State<SplashView> {
                   padding: EdgeInsets.zero,
                   minimumSize: Size(0, 0),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  overlayColor: MaterialStateColor.resolveWith((states) => AppColors.transparent),
+                  overlayColor: MaterialStateColor.resolveWith(
+                    (states) => AppColors.transparent,
+                  ),
                 ),
                 child: Text(
                   "Don't have an account?",

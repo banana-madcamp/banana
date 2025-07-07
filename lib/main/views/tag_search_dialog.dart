@@ -37,7 +37,7 @@ class _TagSearchDialogState extends State<TagSearchDialog> {
                   filteredTags.clear();
                   filteredTags.addAll(
                     tags.compareItem(
-                      searchQuery: controller.value.text,
+                      searchQuery: controller.text,
                       number: maxSuggestions,
                       locale: locale,
                     ),

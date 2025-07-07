@@ -124,8 +124,6 @@ PODS:
   - nanopb/encode (3.30910.0)
   - permission_handler_apple (9.3.0):
     - Flutter
-  - photo_gallery (0.0.1):
-    - Flutter
   - PromisesObjC (2.4.0)
   - RecaptchaInterop (101.0.0)
   - video_player_avfoundation (0.0.1):
@@ -140,7 +138,6 @@ DEPENDENCIES:
   - google_mlkit_image_labeling (from `.symlinks/plugins/google_mlkit_image_labeling/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - photo_gallery (from `.symlinks/plugins/photo_gallery/ios`)
   - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
 
 SPEC REPOS:
@@ -184,8 +181,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
-  photo_gallery:
-    :path: ".symlinks/plugins/photo_gallery/ios"
   video_player_avfoundation:
     :path: ".symlinks/plugins/video_player_avfoundation/darwin"
 
@@ -218,11 +213,10 @@ SPEC CHECKSUMS:
   MLKitVisionKit: 8a7abd5f11aeb1add2942a694c2685eca422a849
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
-  photo_gallery: 9f95e57747cd22c10676ece3660d1ffe6c603ee5
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   video_player_avfoundation: 7c6c11d8470e1675df7397027218274b6d2360b3
 
-PODFILE CHECKSUM: e9bb9f034ae76fe22b5bdec27673190b868b6a05
+PODFILE CHECKSUM: cbe0fff6a1a01479f9ddb9ca2603a203f0198113
 
 COCOAPODS: 1.16.2

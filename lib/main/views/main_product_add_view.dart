@@ -4,12 +4,14 @@ import 'package:banana/main/views/main_bottom_button.dart';
 import 'package:banana/main/views/tag_item_list.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 
 import 'aspect_radio_video.dart';
@@ -301,19 +303,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
       height: 64,
       width: 64,
       child: IconButton(
-        onPressed: () async {
-          final List<XFile> images = await _picker.pickMultiImage();
-          for (XFile image in images) {
-            int index = _images.isNotEmpty ? _images.length : 0;
-            _images.insert(index, image);
-            _imageListKey.currentState!.insertItem(index);
-          }
-          if (_thumbnailIndex == null && _images.isNotEmpty) {
-            setState(() {
-              _thumbnailIndex = 0;
-            });
-          }
-        },
+        onPressed: _pickImage(),
         style: IconButton.styleFrom(
           backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
@@ -490,5 +480,66 @@ class _MainProductAddViewState extends State<MainProductAddView> {
     controller.setLooping(true);
     controller.play();
     return Center(child: AspectRatioVideo(controller));
+  }
+
+  Future<bool> _permission() async {
+    if (Platform.isIOS) {
+      if (await Permission.photos.request().isGranted ||
+          await Permission.storage.request().isGranted) {
+        return true;
+      }
+    }
+    if (Platform.isAndroid) {
+      if (await Permission.storage.request().isGranted ||
+          await Permission.photos.request().isGranted &&
+              await Permission.videos.request().isGranted) {
+        return true;
+      }
+    }
+    Get.dialog(
+      CupertinoAlertDialog(
+        title: Text("Permission Denied"),
+        content: Text("Please allow access to photos in settings."),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text("Cancel"),
+          ),
+          CupertinoDialogAction(
+            onPressed: () {
+              Get.back();
+              openAppSettings();
+            },
+            child: Text("Settings"),
+          ),
+        ],
+      ),
+    );
+    return false;
+  }
+
+  VoidCallback _pickImage() {
+    return () async {
+      if (context.mounted) {
+        if (!await _permission()) return;
+        try {
+          final List<XFile> images = await _picker.pickMultiImage();
+          for (XFile image in images) {
+            int index = _images.isNotEmpty ? _images.length : 0;
+            _images.insert(index, image);
+            _imageListKey.currentState!.insertItem(index);
+          }
+          if (_thumbnailIndex == null && _images.isNotEmpty) {
+            setState(() {
+              _thumbnailIndex = 0;
+            });
+          }
+        } catch (e) {
+          log.e("Error picking images: $e");
+        }
+      }
+    };
   }
 }

@@ -884,7 +884,17 @@ class Tags {
     }
 
     tags.sort((a, b) {
-      return b.compareTo(a);
+      if (a.toLowerCase().contains(searchQuery.toLowerCase()) &&
+          b.toLowerCase().contains(searchQuery.toLowerCase())) {
+        return a.toLowerCase().indexOf(searchQuery.toLowerCase())
+            .compareTo(b.toLowerCase().indexOf(searchQuery.toLowerCase()));
+      } else if (a.toLowerCase().contains(searchQuery.toLowerCase())) {
+        return -1;
+      } else if (b.toLowerCase().contains(searchQuery.toLowerCase())) {
+        return 1;
+      }
+      return 0;
+
     });
     return tags.sublist(0, number);
   }

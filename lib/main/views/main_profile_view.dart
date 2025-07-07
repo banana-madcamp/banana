@@ -54,7 +54,7 @@ class _MainProfileViewState extends State<MainProfileView> {
                                 ? NetworkImage(currentUser.profileImageUrl)
                                 : null,
                             child: currentUser.profileImageUrl.isEmpty
-                                ? Icon(AppIcons.profile, color: AppColors.icon, size: 64)
+                                ? Icon(AppIcons.profile, color: AppColors.iconGray, size: 64)
                                 : null,
                           ),
                         ),
@@ -73,7 +73,7 @@ class _MainProfileViewState extends State<MainProfileView> {
                                   ),
                                 ),      
                                 const SizedBox(width: 6),
-                                const Icon(AppIcons.edit, size: 14, color: AppColors.icon) 
+                                const Icon(AppIcons.edit, size: 14, color: AppColors.iconGray) 
                               ],
                             ),
                             const SizedBox(height: 6),
@@ -115,7 +115,7 @@ class _MainProfileViewState extends State<MainProfileView> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: const [
-                                    Icon(AppIcons.logout, color: AppColors.icon),
+                                    Icon(AppIcons.logout, color: AppColors.iconGray),
                                     SizedBox(height: 4),
                                     Text(
                                       "Logout",
@@ -153,7 +153,7 @@ class _MainProfileViewState extends State<MainProfileView> {
         padding: const EdgeInsets.symmetric(vertical: 18),
         child: Row(
           children: [
-            Icon(icon, size: 30, color: AppColors.icon),
+            Icon(icon, size: 30, color: AppColors.iconGray),
             const SizedBox(width: 20),
             Expanded(
               child: Text(
@@ -162,11 +162,11 @@ class _MainProfileViewState extends State<MainProfileView> {
                   fontFamily: 'Rubik',
                   fontWeight: FontWeight.w500,
                   fontSize: 20,
-                  color: AppColors.icon,
+                  color: AppColors.iconGray,
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right_outlined, color: AppColors.icon),
+            const Icon(Icons.chevron_right_outlined, color: AppColors.iconGray),
           ],
         ),
       ),

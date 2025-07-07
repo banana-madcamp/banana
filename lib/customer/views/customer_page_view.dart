@@ -1,6 +1,7 @@
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomerPageView extends StatefulWidget {
   const CustomerPageView({super.key});
@@ -22,7 +23,7 @@ class _CustomerPageViewState extends State<CustomerPageView> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => Get.back(),
                     child: const Icon(
                       AppIcons.back,
                       color: AppColors.black,
@@ -82,7 +83,27 @@ class _CustomerPageViewState extends State<CustomerPageView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        "주문이 성공적으로 접수되었습니다!",
+                        style: TextStyle(
+                          fontFamily: 'Rubik',
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.white,
+                        ),
+                      ),
+                      backgroundColor: AppColors.logo,
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      margin: const EdgeInsets.all(20),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(

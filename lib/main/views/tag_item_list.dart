@@ -1,4 +1,5 @@
 import 'package:banana/main/datas/local/tags.dart';
+import 'package:banana/main/views/tag_search_dialog.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +16,7 @@ class TagItemList extends StatefulWidget {
 
 class _TagItemListState extends State<TagItemList> {
   List<String> selectedTags = [];
+
   ImageLabeler get imageLabeler => Get.find<ImageLabeler>();
 
   @override
@@ -29,33 +31,14 @@ class _TagItemListState extends State<TagItemList> {
               padding: const EdgeInsets.only(right: 2),
               child: TagItem(tag: tag),
             ),
-          AddTagItem(onPress: (){
-            showCupertinoModalPopup(
-              context: context,
-              builder: (context) {
-                return CupertinoActionSheet(
-                  title: const Text('Add Tag'),
-                  message: const Text('Select a tag to add.'),
-                  actions: [
-                    for (String label in Tags().getTags(locale: 'ko'))
-                      CupertinoActionSheetAction(
-                        onPressed: () {
-                          setState(() {
-                            selectedTags.add(label);
-                          });
-                          Get.back();
-                        },
-                        child: Text(label),
-                      ),
-                  ],
-                  cancelButton: CupertinoActionSheetAction(
-                    onPressed: () => Get.back(),
-                    child: const Text('Cancel'),
-                  ),
-                );
-              },
-            );
-          },),
+          AddTagItem(
+            onPress: () async {
+              final result = await Get.to(() => TagSearchDialog());
+              setState(() {
+                selectedTags = result ?? [];
+              });
+            },
+          ),
         ],
       ),
     );
@@ -93,6 +76,7 @@ class TagItem extends StatelessWidget {
 
 class AddTagItem extends StatelessWidget {
   final VoidCallback onPress;
+
   const AddTagItem({super.key, required this.onPress});
 
   @override

@@ -171,20 +171,7 @@ class _SignupViewState extends State<SignupView> {
                     final email = emailController.text;
                     final password = passwordController.text;
 
-                    final newUser  = User(
-                      userId: DateTime.now().millisecondsSinceEpoch.toString(),
-                      email: email,
-                      password: password,
-                      nickname: nickname,
-                      profileImageUrl: '',
-                      location: '',
-                      address: '',
-                      orderHistory: [],
-                      sellingProducts: [],
-                      paymentMethods: [],
-                    );
-
-                    await userDB.addUser(newUser);
+                    await userDB.addUser(email, password, nickname);
 
                     Get.off(() => const MainView(),
                       transition: Transition.rightToLeftWithFade,

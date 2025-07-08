@@ -2,7 +2,7 @@ import 'package:banana/main/models/product.dart';
 
 abstract class DatabaseSource {
   /// Fetches the data from the backend.
-  Future<List<Product>> fetchData();
+  Future<List<Product>> fetchItems();
 
   /// Saves the data to the backend.
   Future<void> uploadProduct(Product product);

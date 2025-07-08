@@ -24,6 +24,13 @@ class _SigninViewState extends State<SigninView> {
   final passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _isObscured = true;
+  UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
+
+  @override
+  void initState() {
+    super.initState();
+    _userDb.autoLogin();
+  }
 
   @override
   Widget build(BuildContext context) {

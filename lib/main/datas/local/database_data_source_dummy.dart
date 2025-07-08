@@ -19,7 +19,7 @@ class DatabaseSourceDummy extends DatabaseSource {
   }
 
   @override
-  Future<List<Product>> fetchData() {
+  Future<List<Product>> fetchItems() {
     return Future.delayed(const Duration(seconds: 5), () {
       return [
         for (int i = 0; i < 10; i++)

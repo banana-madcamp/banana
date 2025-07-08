@@ -5,7 +5,6 @@ import 'package:banana/login/models/paymentmethod.dart';
 class User {
   final String userId;
   final String email;
-  final String password;
   final String nickname;
   final String address;
   final String location;
@@ -17,7 +16,6 @@ class User {
   User({
   required this.userId,
   required this.email,
-  required this.password,
   required this.nickname,
   required this.address,
   required this.location,
@@ -26,12 +24,45 @@ class User {
   required this.sellingProducts,
   required this.paymentMethods,
   });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      userId: json['userId'] as String,
+      email: json['email'] as String,
+      nickname: json['nickname'] as String,
+      address: json['address'] as String,
+      location: json['location'] as String,
+      profileImageUrl: json['profileImageUrl'] as String,
+      orderHistory: (json['orderHistory'] as List<dynamic>)
+          .map((e) => Order.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      sellingProducts: (json['sellingProducts'] as List<dynamic>)
+          .map((e) => Product.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      paymentMethods: (json['paymentMethods'] as List<dynamic>)
+          .map((e) => PaymentMethod.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  toJson() {
+    return {
+      'userId': userId,
+      'email': email,
+      'nickname': nickname,
+      'address': address,
+      'location': location,
+      'profileImageUrl': profileImageUrl,
+      'orderHistory': orderHistory.map((e) => e.toJson()).toList(),
+      'sellingProducts': sellingProducts.map((e) => e.toJson()).toList(),
+      'paymentMethods': paymentMethods.map((e) => e.toJson()).toList(),
+    };
+  }
 }
 
 extension UserCopy on User {
   User copyWith({
     String? email,
-    String? password,
     String? nickname,
     String? profileImageUrl,
     List<Order>? orderHistory,
@@ -43,7 +74,6 @@ extension UserCopy on User {
     return User(
       userId: userId,
       email: email ?? this.email,
-      password: password ?? this.password,
       nickname: nickname ?? this.nickname,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       orderHistory: orderHistory ?? this.orderHistory,

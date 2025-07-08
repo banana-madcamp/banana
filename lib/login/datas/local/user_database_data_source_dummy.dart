@@ -3,12 +3,11 @@ import 'package:banana/login/models/user.dart';
 import 'package:banana/login/models/order.dart';
 import 'package:banana/main/models/product.dart';
 
-class UserDatabaseSourceDummy extends UserDatabaseSource{
+class UserDatabaseSourceDummy extends UserDatabaseSource {
   final List<User> _users = [
     User(
-      userId: 'u001', 
-      email: 'demo@banana.com', 
-      password: '12345', 
+      userId: 'u001',
+      email: 'demo@banana.com',
       nickname: '바나나',
       address: '대전 유성구 대학로 291',
       location: '대전 유성구',
@@ -18,9 +17,8 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
       paymentMethods: [],
     ),
     User(
-      userId: 'u002', 
-      email: 'test@banana.com', 
-      password: '12345', 
+      userId: 'u002',
+      email: 'test@banana.com',
       nickname: '테스트',
       address: '서울 강남구 테헤란로 123',
       location: '서울 강남구',
@@ -30,9 +28,8 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
       paymentMethods: [],
     ),
     User(
-      userId: 'u003', 
-      email: 'user@banana.com', 
-      password: '12345', 
+      userId: 'u003',
+      email: 'user@banana.com',
       nickname: '사용자',
       address: '부산 해운대구 해운대로 456',
       location: '부산 해운대구',
@@ -42,18 +39,26 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
       paymentMethods: [],
     )
   ];
-  
+
   // 현재 로그인된 사용자를 추적
   User? _currentUser;
 
   @override
-  Future<void> addUser(User user) async{
+  Future<User?> addUser(String email, String password, String nickname) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    _users.add(user);
+    return User(userId: '${_users.length + 1}',
+        email: email,
+        nickname: nickname,
+        address: '',
+        location: '',
+        profileImageUrl: '',
+        orderHistory: [],
+        sellingProducts: [],
+        paymentMethods: []);
   }
 
   @override
-  Future<void> deleteUser(String userId) async{
+  Future<void> deleteUser(String userId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     _users.removeWhere((u) => u.userId == userId);
   }
@@ -61,15 +66,17 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
   @override
   Future<User?> findUser(String email, String password) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    final user = _users.where((u) => u.email == email && u.password == password).firstOrNull;
+    final user = _users
+        .where((u) => u.email == email)
+        .firstOrNull;
     if (user != null) {
       _currentUser = user; // 로그인 성공 시 현재 사용자로 설정
     }
     return user;
   }
-  
+
   @override
-  Future<List<User>> fetchUsers() async{
+  Future<List<User>> fetchUsers() async {
     await Future.delayed(const Duration(seconds: 2));
     return _users;
   }
@@ -88,7 +95,7 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
   }
 
   @override
-  Future<void> addOrder(String userId, Order order) async{
+  Future<void> addOrder(String userId, Order order) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _users.indexWhere((u) => u.userId == userId);
     if (index != -1) {
@@ -105,7 +112,7 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
   }
 
   @override
-  Future<void> addProduct(String userId, Product product) async{
+  Future<void> addProduct(String userId, Product product) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _users.indexWhere((u) => u.userId == userId);
     if (index != -1) {
@@ -127,9 +134,15 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
     // 현재 로그인된 사용자가 있으면 반환, 없으면 첫 번째 사용자 반환
     return _currentUser ?? _users.first;
   }
-  
+
   // 로그아웃 메서드 추가
   Future<void> logout() async {
     _currentUser = null;
+  }
+
+  @override
+  Future<User?> autoLogin() {
+    // TODO: implement autoLogin
+    throw UnimplementedError();
   }
 }

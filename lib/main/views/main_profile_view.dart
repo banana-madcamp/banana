@@ -19,7 +19,7 @@ class _MainProfileViewState extends State<MainProfileView> {
   void initState() {
     super.initState();
     final userDB = Get.find<UserDatabaseSource>();
-    _userFuture = Future.value(userDB.getCurrentUser());
+    _userFuture = userDB.getCurrentUser();
   }
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class _MainProfileViewState extends State<MainProfileView> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 80),
+                  const SizedBox(height: 50),
                 
                   Expanded(
                     child: Padding(
@@ -109,7 +109,7 @@ class _MainProfileViewState extends State<MainProfileView> {
                           Align(
                             alignment: Alignment.bottomRight,
                             child: Padding(
-                              padding: const EdgeInsets.only(bottom: 80),
+                              padding: const EdgeInsets.only(bottom: 40),
                               child: GestureDetector(
                                 onTap: () {},
                                 child: Column(

@@ -8,6 +8,7 @@ class Product {
   final List<String> tag;
   final String location;
   final String imageUrl;
+  final List<String>? imageUrls;
   final DateTime createdAt;
 
   Product({
@@ -19,7 +20,7 @@ class Product {
     required this.price,
     required this.tag,
     required this.location,
-    required this.imageUrl,
+    required this.imageUrl, this.imageUrls,
     required this.createdAt,
   });
 }

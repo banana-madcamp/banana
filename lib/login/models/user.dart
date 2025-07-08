@@ -1,3 +1,4 @@
+import 'package:banana/login/models/deliverymethod.dart';
 import 'package:banana/login/models/order.dart';
 import 'package:banana/main/models/product.dart';
 import 'package:banana/login/models/paymentmethod.dart';
@@ -13,6 +14,7 @@ class User {
   final List<Order> orderHistory;
   final List<Product> sellingProducts;
   final List<PaymentMethod> paymentMethods;
+  final List<DeliveryMethod> deliveryMethods;
 
   User({
   required this.userId,
@@ -25,6 +27,7 @@ class User {
   required this.orderHistory,
   required this.sellingProducts,
   required this.paymentMethods,
+  required this.deliveryMethods,
   });
 }
 
@@ -39,6 +42,7 @@ extension UserCopy on User {
     String? location,
     String? address,
     List<PaymentMethod>? paymentMethods,
+    List<DeliveryMethod>? deliveryMethods,
   }) {
     return User(
       userId: userId,
@@ -51,6 +55,7 @@ extension UserCopy on User {
       location: location ?? this.location,
       address: address ?? this.address,
       paymentMethods: paymentMethods ?? this.paymentMethods,
+      deliveryMethods: deliveryMethods ?? this.deliveryMethods,
     );
   }
 }

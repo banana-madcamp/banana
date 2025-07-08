@@ -182,6 +182,7 @@ class _SignupViewState extends State<SignupView> {
                       orderHistory: [],
                       sellingProducts: [],
                       paymentMethods: [],
+                      deliveryMethods: [],
                     );
 
                     await userDB.addUser(newUser);

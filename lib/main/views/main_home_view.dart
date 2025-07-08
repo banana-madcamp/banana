@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../customer/views/product_detail_page_view.dart';
 import '../../utils/values/app_colors.dart';
 import '../datas/source/database_source.dart';
 import '../models/product.dart';
@@ -125,68 +126,98 @@ class _MainHomeViewState extends State<MainHomeView> {
                   horizontal: 27.5,
                   vertical: 10,
                 ),
-                child: Container(
-                  width: 320,
-                  height: 142,
-                  decoration: BoxDecoration(
-                    color: AppColors.lightGray,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 15,
-                      right: 15,
-                      top: 20,
+                child: GestureDetector(
+                  onTap: (){
+                    Get.to(() => ProductDetailView(), arguments: product);
+                  },
+                  child: Container(
+                    width: 320,
+                    height: 142,
+                    decoration: BoxDecoration(
+                      color: AppColors.lightGray,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: Container(
-                            width: 68,
-                            height: 68,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                image: NetworkImage(product.thumbnailImageUrl),
-                                fit: BoxFit.cover,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 15,
+                        right: 15,
+                        top: 20,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                              width: 68,
+                              height: 68,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                image: DecorationImage(
+                                  image: NetworkImage(product.thumbnailImageUrl),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                product.title,
-                                style: const TextStyle(
-                                  height: 18 / 14,
-                                  fontFamily: 'Inter',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.black,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.title,
+                                  style: const TextStyle(
+                                    height: 18 / 14,
+                                    fontFamily: 'Inter',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.black,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                "게시일 : ${product.createdAt.toLocal().toString().split(' ')[0]}",
-                                style: const TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.normal,
-                                  color: AppColors.gray,
+                                const SizedBox(height: 5),
+                                Text(
+                                  "게시일 : ${product.createdAt.toLocal().toString().split(' ')[0]}",
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.normal,
+                                    color: AppColors.gray,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 5),
-                              Row(
-                                children: [
-                                  for (final tag in product.tag)
+                                const SizedBox(height: 5),
+                                Row(
+                                  children: [
+                                    for (final tag in product.tag)
+                                      Text(
+                                        "#$tag",
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.normal,
+                                          color: AppColors.black,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
                                     Text(
-                                      "#$tag",
+                                      "${NumberFormat('#,##,###').format(product.price)} 원",
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.black,
+                                      ),
+                                    ),
+                                    Text(
+                                      product.location,
                                       style: const TextStyle(
                                         fontFamily: 'Inter',
                                         fontSize: 12,
@@ -194,38 +225,13 @@ class _MainHomeViewState extends State<MainHomeView> {
                                         color: AppColors.black,
                                       ),
                                     ),
-                                ],
-                              ),
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "${NumberFormat('#,##,###').format(product.price)} 원",
-                                    style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w900,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
-                                  Text(
-                                    product.location,
-                                    style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.normal,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

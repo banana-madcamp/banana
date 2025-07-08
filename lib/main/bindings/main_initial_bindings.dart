@@ -7,7 +7,6 @@ import 'package:logger/logger.dart';
 class MainInitialBindings implements Bindings {
   @override
   void dependencies() {
-    Get.put<DatabaseSource>(DatabaseSourceDummy());
     Get.put<Logger>(Logger(), tag: 'MainLogger');
     Get.put<ImageLabeler>(
       ImageLabeler(options: ImageLabelerOptions(confidenceThreshold: 0.5)),

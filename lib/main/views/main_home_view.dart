@@ -48,7 +48,7 @@ class _MainHomeViewState extends State<MainHomeView> {
     products = dummyProducts;
     db = Get.find<DatabaseSource>();
     db
-        .fetchData()
+        .fetchItems()
         .then((value) {
           setState(() {
             _loading = false;

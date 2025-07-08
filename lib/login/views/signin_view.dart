@@ -9,8 +9,6 @@ import 'package:get/get.dart';
 
 import '../../main/views/main_view.dart';
 
-final UserDatabaseSource userDB = UserDatabaseSourceDummy();
-
 class SigninView extends StatefulWidget {
   const SigninView({super.key});
 
@@ -24,6 +22,20 @@ class _SigninViewState extends State<SigninView> {
   final passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _isObscured = true;
+  UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
+
+  @override
+  void initState() {
+    super.initState();
+    _userDb.autoLogin().then((user){
+      if(user == null) return;
+      Get.off(
+        () => const MainView(),
+        transition: Transition.rightToLeftWithFade,
+        duration: const Duration(milliseconds: 200),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +180,7 @@ class _SigninViewState extends State<SigninView> {
                       final email = emailController.text;
                       final password = passwordController.text;
 
-                      final user = await userDB.findUser(email, password);
+                      final user = await _userDb.findUser(email, password);
 
                       if (user != null) {
                         Get.off(

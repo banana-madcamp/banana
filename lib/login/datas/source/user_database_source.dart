@@ -7,20 +7,21 @@ abstract class UserDatabaseSource {
   Future<List<User>> fetchUsers();
 
   // add user to the backend
-  Future<void> addUser(User user);
+  Future<User?> addUser(String email, String password, String nickname);
 
-  // delete user 
+  Future<User?> autoLogin();
+
+  // delete user
   Future<void> deleteUser(String userId);
 
   Future<void> addOrder(String userId, Order order);
 
   Future<User?> findUser(String email, String password);
 
-  Future<void> addProduct(String userId, Product product);
-
   Future<void> updateUser(User updatedUser);
 
   Future<User> getCurrentUser();
-  
+
+  // 로그아웃 메서드
   Future<void> logout();
 }

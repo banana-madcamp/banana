@@ -1,6 +1,5 @@
 import 'package:banana/login/models/user.dart';
 import 'package:banana/login/models/order.dart';
-import 'package:banana/main/models/product.dart';
 
 abstract class UserDatabaseSource {
   //fetches all users from the backend
@@ -22,6 +21,13 @@ abstract class UserDatabaseSource {
 
   Future<User> getCurrentUser();
 
+  Future<void> changePassword(String newPassword);
+
+  Future<void> updateUserLocation(String userId, String location);
+
+  Future<User?> getUserById(String userId);
+
+  Future<void> updateUserNickName(String userId, String nickname);
   // 로그아웃 메서드
   Future<void> logout();
 }

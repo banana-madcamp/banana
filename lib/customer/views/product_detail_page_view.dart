@@ -28,8 +28,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   int _getImageCount() {
-    if (product?.imageUrls != null && product!.imageUrls!.isNotEmpty) {
-      return product!.imageUrls!.length;
+    if (product?.imageUrls != null && product!.imageUrls.isNotEmpty) {
+      return product!.imageUrls.length;
     }
     return 1;
   }
@@ -90,9 +90,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           },
                           itemBuilder: (context, index) {
                             String imageUrl = '';
-                            if(product?.imageUrls != null && product!.imageUrls!.isNotEmpty
-                              && index < product!.imageUrls!.length) {
-                                imageUrl = product!.imageUrls![index];
+                            if(product?.imageUrls != null && product!.imageUrls.isNotEmpty
+                              && index < product!.imageUrls.length) {
+                                imageUrl = product!.imageUrls[index];
                               } else {
                                 imageUrl = product?.thumbnailImageUrl ?? '';
                               }

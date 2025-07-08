@@ -176,4 +176,60 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
     await storage.delete(key: 'password');
     log.i('Auth token removed successfully');
   }
+
+  @override
+  Future<void> changePassword(String newPassword) async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        await user.updatePassword(newPassword);
+        log.i('Password changed successfully');
+      } 
+    } catch (error) {
+      log.e('Error changing password: $error');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateUserLocation(String userId, String location) async {
+    try {
+      await _db.collection('users').doc(userId).update({
+        'location': location,
+      });
+      log.i('User location updated successfully');
+    } catch (error) {
+      log.e('Error updating user location: $error');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<User?> getUserById(String userId) async {
+    try {
+      final doc = await _db.collection('users').doc(userId).get();
+      if (doc.exists) {
+        return User.fromJson(doc.data()!);
+      } else {
+        log.e('User document does not exist for ID: $userId');
+        return null;
+      }
+    } catch (error) {
+      log.e('Error fetching user by ID: $error');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> updateUserNickName(String userId, String nickname) async {
+    try {
+      await _db.collection('users').doc(userId).update({
+        'nickname': nickname,
+      });
+      log.i('User nickname updated successfully');
+    } catch (error) {
+      log.e('Error updating user nickname: $error');
+      rethrow;
+    }
+  }
 }

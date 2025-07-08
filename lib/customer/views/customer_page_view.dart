@@ -1,5 +1,6 @@
 import 'package:banana/login/datas/source/user_database_source.dart';
 import 'package:banana/login/models/deliverymethod.dart';
+import 'package:banana/login/models/order.dart';
 import 'package:banana/login/models/paymentmethod.dart';
 import 'package:banana/login/models/user.dart';
 import 'package:banana/main/models/product.dart';
@@ -21,15 +22,38 @@ class _CustomerPageViewState extends State<CustomerPageView> {
   String? selectedAddress;
   PaymentMethod? selectedPaymentMethod;
   DeliveryMethod? selectedDeliveryMethod;
+  UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
 
   @override
   void initState() {
     super.initState();
-    final userDB = Get.find<UserDatabaseSource>();
-    _userFuture = Future.value(userDB.getCurrentUser());
+    _userFuture = Future.value(_userDb.getCurrentUser());
     selectedProduct = Get.arguments as Product?;
   }
 
+  Future<void> _submitOrder(User user) async{
+    final selectedDelivery = selectedDeliveryMethod ??
+        (user.deliveryMethods.isNotEmpty ? user.deliveryMethods.first : null);
+
+    try {
+      final order = Order(
+        orderId: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: user.userId,
+        product: selectedProduct!,
+        orderedAt: DateTime.now(),
+        orderAmount: selectedProduct!.price,
+        deliveryPrice: selectedDelivery!.price,
+        totalAmount: selectedProduct!.price + selectedDelivery.price,
+      );
+
+      await _userDb.addOrder(user.userId, order);
+
+      _showSuccessSnackBar();
+
+      Get.back();
+
+    } catch (error) {print('Order submission error: $error');}
+  }
   void _showAddressEditDialog(User user) {
     final TextEditingController addressController = 
       TextEditingController(text: selectedAddress ?? user.address);
@@ -184,6 +208,28 @@ class _CustomerPageViewState extends State<CustomerPageView> {
       ),
     );
   }
+
+  void _showSuccessSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          "주문이 성공적으로 접수되었습니다!",
+          style: TextStyle(
+            fontFamily: 'Rubik',
+            fontWeight: FontWeight.w500,
+            color: AppColors.white,
+          ),
+        ),
+        backgroundColor: AppColors.logo,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        margin: const EdgeInsets.all(20),
+      ),
+    );
+  }
     
   @override
   Widget build(BuildContext context) {
@@ -266,27 +312,7 @@ class _CustomerPageViewState extends State<CustomerPageView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text(
-                        "주문이 성공적으로 접수되었습니다!",
-                        style: TextStyle(
-                          fontFamily: 'Rubik',
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.white,
-                        ),
-                      ),
-                      backgroundColor: AppColors.logo,
-                      duration: const Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      margin: const EdgeInsets.all(20),
-                    ),
-                  );
-                },
+                onPressed: () => _submitOrder(currentUser),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(

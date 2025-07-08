@@ -1,4 +1,6 @@
 import 'package:banana/customer/views/customer_page_view.dart';
+import 'package:banana/login/datas/source/user_database_source.dart';
+import 'package:banana/login/models/user.dart';
 import 'package:banana/main/models/product.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
@@ -16,11 +18,17 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   Product? product;
   bool isLiked = false;
   int currentImageIndex = 0;
+  late Future<User?> _sellerFuture;
+
+  UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
 
   @override
   void initState() {
     super.initState();
     product = Get.arguments as Product?;
+    _sellerFuture = product != null
+        ? _userDb.getUserById(product!.userId)
+        : Future.value(null);
   }
 
   String _formatDate(DateTime date) {
@@ -28,8 +36,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   int _getImageCount() {
-    if (product?.imageUrls != null && product!.imageUrls!.isNotEmpty) {
-      return product!.imageUrls!.length;
+    if (product?.imageUrls != null && product!.imageUrls.isNotEmpty) {
+      return product!.imageUrls.length;
     }
     return 1;
   }
@@ -81,44 +89,48 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       SizedBox(
                         height: 380,
                         width: double.infinity,
-                        child: PageView.builder(
-                          itemCount : _getImageCount(),
-                          onPageChanged: (index) {
-                            setState(() {
-                              currentImageIndex = index;
-                            });
-                          },
-                          itemBuilder: (context, index) {
-                            String imageUrl = '';
-                            if(product?.imageUrls != null && product!.imageUrls!.isNotEmpty
-                              && index < product!.imageUrls!.length) {
-                                imageUrl = product!.imageUrls![index];
-                              } else {
-                                imageUrl = product?.thumbnailImageUrl ?? '';
-                              }
-
-                            return Image.network(
-                              imageUrl,
-                              height: 380,
-                              width: 380,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                        child: Stack(
+                          children: [ 
+                            PageView.builder(
+                              itemCount : _getImageCount(),
+                              onPageChanged: (index) {
+                                setState(() {
+                                  currentImageIndex = index;
+                                });
+                              },
+                              itemBuilder: (context, index) {
+                                String imageUrl = '';
+                                if(product?.imageUrls != null && product!.imageUrls.isNotEmpty
+                                  && index < product!.imageUrls.length) {
+                                    imageUrl = product!.imageUrls[index];
+                                  } else {
+                                    imageUrl = product?.thumbnailImageUrl ?? '';
+                                  }
+                          
+                                return Image.network(
+                                  imageUrl,
                                   height: 380,
                                   width: 380,
-                                  color: AppColors.gray.withAlpha(40),
-                                  child: Icon(
-                                    Icons.image,
-                                    size: 80,
-                                    color: AppColors.darkGray,
-                                  ),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      height: 380,
+                                      width: 380,
+                                      color: AppColors.gray.withAlpha(40),
+                                      child: Icon(
+                                        Icons.image,
+                                        size: 80,
+                                        color: AppColors.darkGray,
+                                      ),
+                                    );
+                                  },
                                 );
-                              },
-                            );
-                          }
+                              }
+                            ),
+                            _buildSellerInfoOverlay(),
+                          ],
                         ),
                       ),
-
                       const SizedBox(height: 12), 
 
                       if (_getImageCount() >= 1)
@@ -324,5 +336,84 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         ),
       ],  
     ),),);                                        
+  }
+
+  Widget _buildSellerInfoOverlay() {
+  return Positioned(
+    top: 16,
+    left: 16,
+    right: 16,
+    child: FutureBuilder<User?>(
+      future: _sellerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+
+        final seller = snapshot.data;
+        if (seller == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.black.withAlpha(140), 
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.white,
+                backgroundImage: seller.profileImageUrl.isNotEmpty
+                    ? NetworkImage(seller.profileImageUrl)
+                    : null,
+                child: seller.profileImageUrl.isEmpty
+                    ? Icon(
+                        AppIcons.profile,
+                        color: AppColors.iconGray,
+                        size: 24,
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      seller.nickname,
+                      style: const TextStyle(
+                        fontFamily: 'Rubik',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          seller.location.isNotEmpty ? seller.location : product?.location ?? '',
+                          style: const TextStyle(
+                            fontFamily: 'Rubik',
+                            fontSize: 14, 
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.gray,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  );
   }
 }

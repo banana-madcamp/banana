@@ -67,11 +67,8 @@ class _MainViewState extends State<MainView>
         activeColorPrimary: AppColors.primary,
         inactiveColorPrimary: CupertinoColors.systemGrey,
         onPressed: (context) {
-          Get.bottomSheet(
-            MainProductAddView(),
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-          );
+          Get.to(() => MainProductAddView(),
+               transition: Transition.downToUp);
         },
       ),
       PersistentBottomNavBarItem(

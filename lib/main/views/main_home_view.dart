@@ -31,12 +31,13 @@ class _MainHomeViewState extends State<MainHomeView> {
         title: 'Banana Chips - lorem ipsum dolor sit amet, consectetur',
         description: 'This is a dummy product description.',
         price: 1000,
-        imageUrl: AppAssets.banana,
+        thumbnailImageUrl: AppAssets.banana,
         userId: '',
         subTitle: 'this is a dummy product sub title',
         tag: ['dummy'],
         location: '대전 유성구',
         createdAt: DateTime.now(),
+        imageUrls: []
       ),
   ];
 

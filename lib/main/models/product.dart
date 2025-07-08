@@ -7,7 +7,8 @@ class Product {
   final double price;
   final List<String> tag;
   final String location;
-  final String imageUrl;
+  final String thumbnailImageUrl;
+  final List<String> imageUrls;
   final DateTime createdAt;
 
   Product({
@@ -19,7 +20,8 @@ class Product {
     required this.price,
     required this.tag,
     required this.location,
-    required this.imageUrl,
+    required this.thumbnailImageUrl,
+    required this.imageUrls,
     required this.createdAt,
   });
 }

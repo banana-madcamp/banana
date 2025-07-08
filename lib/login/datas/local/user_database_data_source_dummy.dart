@@ -1,4 +1,6 @@
 import 'package:banana/login/datas/source/user_database_source.dart';
+import 'package:banana/login/models/deliverymethod.dart';
+import 'package:banana/login/models/paymentmethod.dart';
 import 'package:banana/login/models/user.dart';
 import 'package:banana/login/models/order.dart';
 import 'package:banana/main/models/product.dart';
@@ -15,7 +17,12 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
       profileImageUrl: 'https://via.placeholder.com/150',
       orderHistory: [],
       sellingProducts: [],
-      paymentMethods: [],
+      paymentMethods: [
+        PaymentMethod(type: 'Master Card', details: '••••  ••••  ••••  5678'),
+      ],
+      deliveryMethods: [
+        DeliveryMethod(type: 'DHL', description: 'Fast', timeFrame: '2-3 days', price: 5.0)
+      ]
     ),
     User(
       userId: 'u002', 
@@ -27,7 +34,12 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
       profileImageUrl: '',
       orderHistory: [],
       sellingProducts: [],
-      paymentMethods: [],
+      paymentMethods: [
+        PaymentMethod(type: 'Visa', details: '••••  ••••  ••••  9012'),
+      ],
+      deliveryMethods: [
+        DeliveryMethod(type: 'FedEx', description: 'Express', timeFrame: '1-2 days', price: 7.0)
+      ]
     ),
     User(
       userId: 'u003', 
@@ -39,7 +51,12 @@ class UserDatabaseSourceDummy extends UserDatabaseSource{
       profileImageUrl: 'https://via.placeholder.com/150/FF6B6B/FFFFFF?text=U',
       orderHistory: [],
       sellingProducts: [],
-      paymentMethods: [],
+      paymentMethods: [
+        PaymentMethod(type: 'American Express', details: '••••  ••••  ••••  3456'),
+      ],
+      deliveryMethods: [
+        DeliveryMethod(type: 'UPS', description: 'Standard', timeFrame: '3-5 days', price: 3.0)
+      ]
     )
   ];
   

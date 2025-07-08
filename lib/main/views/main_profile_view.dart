@@ -19,16 +19,15 @@ class _MainProfileViewState extends State<MainProfileView> {
   void initState() {
     super.initState();
     final userDB = Get.find<UserDatabaseSource>();
-    _userFuture = Future.value(userDB.getCurrentUser());
+    _userFuture = userDB.getCurrentUser();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: FutureBuilder(
-          future: _userFuture,
+          future: _userFuture, 
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               return const Center(child: CircularProgressIndicator());
@@ -44,131 +43,98 @@ class _MainProfileViewState extends State<MainProfileView> {
                 const SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 114,
-                        height: 114,
-                        child: CircleAvatar(
-                          backgroundColor: AppColors.white,
-                          backgroundImage:
-                              currentUser.profileImageUrl.isNotEmpty
-                                  ? NetworkImage(currentUser.profileImageUrl)
-                                  : null,
-                          child:
-                              currentUser.profileImageUrl.isEmpty
-                                  ? Icon(
-                                    AppIcons.profile,
-                                    color: AppColors.iconGray,
-                                    size: 64,
-                                  )
-                                  : null,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                currentUser.nickname,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 20,
-                                  fontFamily: 'Rubik',
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              const Icon(
-                                AppIcons.edit,
-                                size: 14,
-                                color: AppColors.iconGray,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            currentUser.email,
-                            style: TextStyle(
-                              fontFamily: 'Rubik',
-                              fontWeight: FontWeight.w300,
-                              fontSize: 14,
-                              color: AppColors.gray,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 80),
-
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
+                    child: Row(
                       children: [
-                        _buildMenuItem(
-                          icon: AppIcons.password,
-                          label: "Change Password",
-                          onTap: () {},
+                        SizedBox(
+                          width: 114,
+                          height: 114,
+                          child: CircleAvatar(
+                            backgroundColor:AppColors.white,
+                            backgroundImage: currentUser.profileImageUrl.isNotEmpty
+                                ? NetworkImage(currentUser.profileImageUrl)
+                                : null,
+                            child: currentUser.profileImageUrl.isEmpty
+                                ? Icon(AppIcons.profile, color: AppColors.iconGray, size: 64)
+                                : null,
+                          ),
                         ),
-                        _buildMenuItem(
-                          icon: AppIcons.sales,
-                          label: "My Sales",
-                          onTap: () {},
-                        ),
-                        _buildMenuItem(
-                          icon: AppIcons.shoppingBag,
-                          label: "My Order",
-                          onTap: () {},
-                        ),
-                        _buildMenuItem(
-                          icon: AppIcons.location,
-                          label: "Edit Location",
-                          onTap: () {},
-                        ),
-                        _buildMenuItem(
-                          icon: AppIcons.deleteAccount,
-                          label: "Delete Account",
-                          onTap: () {},
-                        ),
-
-                        const Spacer(),
-
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 80),
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(
-                                    AppIcons.logout,
-                                    color: AppColors.iconGray,
+                        const SizedBox(width: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  currentUser.nickname, 
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700, 
+                                    fontSize: 20, 
+                                    fontFamily: 'Rubik',
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Logout",
-                                    style: TextStyle(
-                                      fontFamily: 'Rubik',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
+                                ),      
+                                const SizedBox(width: 6),
+                                const Icon(AppIcons.edit, size: 14, color: AppColors.iconGray) 
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              currentUser.email,
+                              style: TextStyle(
+                                fontFamily: 'Rubik',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 14,
+                                color: AppColors.gray,
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 50),
+                
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        children: [
+                          _buildMenuItem(icon: AppIcons.password, label: "Change Password", onTap: () {}),
+                          _buildMenuItem(icon: AppIcons.sales, label: "My Sales", onTap: () {}),
+                          _buildMenuItem(icon: AppIcons.shoppingBag, label: "My Order", onTap: () {}),
+                          _buildMenuItem(icon: AppIcons.location, label: "Edit Location", onTap: () {}),
+                          _buildMenuItem(icon: AppIcons.deleteAccount, label: "Delete Account", onTap: () {}),
+
+                          const Spacer(),
+                        
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 40),
+                              child: GestureDetector(
+                                onTap: () {},
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Icon(AppIcons.logout, color: AppColors.iconGray),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      "Logout",
+                                      style: TextStyle(
+                                        fontFamily: 'Rubik',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
             );
           },
         ),

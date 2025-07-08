@@ -22,6 +22,5 @@ abstract class UserDatabaseSource {
 
   Future<User> getCurrentUser();
   
-  // 로그아웃 메서드
   Future<void> logout();
 }

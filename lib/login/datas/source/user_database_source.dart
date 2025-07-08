@@ -18,7 +18,6 @@ abstract class UserDatabaseSource {
 
   Future<User?> findUser(String email, String password);
 
-
   Future<void> updateUser(User updatedUser);
 
   Future<User> getCurrentUser();

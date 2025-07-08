@@ -1,10 +1,7 @@
-import 'dart:collection';
-import 'dart:math';
 
 import 'package:banana/main/bindings/main_initial_bindings.dart';
 import 'package:banana/main/views/main_location_view.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../utils/values/app_colors.dart';

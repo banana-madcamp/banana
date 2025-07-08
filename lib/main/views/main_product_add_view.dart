@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:banana/login/datas/source/user_database_source.dart';
 import 'package:banana/main/datas/source/database_source.dart';
 import 'package:banana/main/models/product.dart';
 import 'package:banana/main/models/product_information_image.dart';
@@ -36,14 +37,18 @@ class _MainProductAddViewState extends State<MainProductAddView> {
   final priceController = TextEditingController();
   final tradingAreaController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final List<ProductInformationImage> _productImages = [];
   int? _thumbnailIndex;
   final GlobalKey<AnimatedListState> _imageListKey =
       GlobalKey<AnimatedListState>();
   final log = Get.find<Logger>(tag: 'MainLogger');
   final List<String> _tags = Get.find<List<String>>(tag: 'SelectedTags');
+  bool isUploading = false;
 
   DatabaseSource get _db => Get.find<DatabaseSource>();
+
+  UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
 
   @override
   void initState() {
@@ -174,126 +179,144 @@ class _MainProductAddViewState extends State<MainProductAddView> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(color: AppColors.white),
-          padding: EdgeInsets.symmetric(horizontal: 18),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Text(
-                    'Product Information',
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: AppColors.black,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Rubik',
-                    ),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Container(
+                height: Get.height + 100,
+                decoration: BoxDecoration(color: AppColors.white),
+                padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text(
+                            'Product Information',
+                            style: TextStyle(
+                              fontSize: 24,
+                              color: AppColors.black,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Rubik',
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            icon: Icon(AppIcons.close),
+                            style: IconButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size(0, 0),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 19),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          imageAddButton(),
+                          SizedBox(width: 8),
+                          Expanded(child: imageList()),
+                        ],
+                      ),
+                      SizedBox(height: 15),
+                      titleTextField(),
+                      subTitleTextField(),
+                      SizedBox(
+                        height: 36,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Description',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.black,
+                                fontFamily: 'Rubik',
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      descriptionTextField(),
+                      SizedBox(
+                        height: 36,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Tags',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.black,
+                                fontFamily: 'Rubik',
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      TagItemList(),
+                      SizedBox(
+                        height: 36,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Price',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.black,
+                                fontFamily: 'Rubik',
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      priceTextField(),
+                      SizedBox(
+                        height: 36,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Trading Area',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.black,
+                                fontFamily: 'Rubik',
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      tradingAreaTextField(),
+                    ],
                   ),
-                  IconButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    icon: Icon(AppIcons.close),
-                    style: IconButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 19),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  imageAddButton(),
-                  SizedBox(width: 8),
-                  Expanded(child: imageList()),
-                ],
-              ),
-              SizedBox(height: 15),
-              titleTextField(),
-              subTitleTextField(),
-              SizedBox(
-                height: 36,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Description',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.black,
-                        fontFamily: 'Rubik',
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ],
                 ),
               ),
-              descriptionTextField(),
-              SizedBox(
-                height: 36,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Tags',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.black,
-                        fontFamily: 'Rubik',
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              TagItemList(),
-              SizedBox(
-                height: 36,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Price',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.black,
-                        fontFamily: 'Rubik',
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              priceTextField(),
-              SizedBox(
-                height: 36,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Trading Area',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.black,
-                        fontFamily: 'Rubik',
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              tradingAreaTextField(),
-              Expanded(child: Container()),
-              MainBottomButton(
+            ),
+            Positioned(
+              bottom: 20,
+              left: 16,
+              right: 16,
+              child: MainBottomButton(
                 onPressed: () {
+                  if (!_formKey.currentState!.validate()) {
+                    return;
+                  }
                   InformationValidator()
                       .validateTags(
                         _productImages
@@ -319,21 +342,47 @@ class _MainProductAddViewState extends State<MainProductAddView> {
                             errorIndexes.add(i);
                           }
                         }
-                        if (errorIndexes.isEmpty) {
-                          log.i("submit");
-                          upload();
-                        } else {
-                          log.e("Invalid tags at indexes: $errorIndexes");
-                          setState(() {
-                            for (int index in errorIndexes) {
-                              _productImages[index].isValid = false;
-                            }
+                        if (errorIndexes.isEmpty &&
+                            _productImages.isNotEmpty &&
+                            _thumbnailIndex != null) {
+                          upload().then((value) {
+                            log.i("Product uploaded successfully");
+                            Get.back();
+                            Get.snackbar(
+                              "Success",
+                              "Product has been listed successfully.",
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: AppColors.green.withValues(
+                                alpha: 0.8,
+                              ),
+                              colorText: AppColors.white,
+                            );
                           });
+                        } else {
+                          String errorHeader = "Unsuccessful submission";
+                          String errorMessage =
+                              "Please check the following errors:";
+                          if (errorIndexes.isNotEmpty) {
+                            errorMessage +=
+                                "\n- Invalid tags at indexes: $errorIndexes";
+                            setState(() {
+                              for (int index in errorIndexes) {
+                                _productImages[index].isValid = false;
+                              }
+                            });
+                          }
+                          if (_productImages.isEmpty) {
+                            errorMessage += "\n- No images selected";
+                          }
+                          if (_thumbnailIndex == null) {
+                            errorMessage += "\n- No thumbnail selected";
+                          }
                           Get.dialog(
                             CupertinoAlertDialog(
-                              title: Text("Invalid Tags"),
+                              title: Text(errorHeader),
                               content: Text(
-                                "Please ensure that all images have valid tags.",
+                                errorMessage,
+                                textAlign: TextAlign.start,
                               ),
                               actions: [
                                 CupertinoDialogAction(
@@ -350,9 +399,8 @@ class _MainProductAddViewState extends State<MainProductAddView> {
                 },
                 text: "LIST A PRODUCT",
               ),
-              SizedBox(height: 20),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -627,32 +675,21 @@ class _MainProductAddViewState extends State<MainProductAddView> {
     List<String> imageDownloadLinks = await _db.uploadImages(
       _productImages.map((image) => image.image.path).toList(),
     );
-    _db
-        .uploadProduct(
-          Product(
-            userId: "",
-            id: "",
-            title: titleController.text,
-            subTitle: subTitleController.text,
-            description: descriptionController.text,
-            price: double.tryParse(priceController.text) ?? 0.0,
-            tag: _tags,
-            location: tradingAreaController.text,
-            thumbnailImageUrl: imageDownloadLinks[_thumbnailIndex ?? 0],
-            createdAt: DateTime.now(),
-            imageUrls: imageDownloadLinks,
-          ),
-        )
-        .then((value) {
-          log.i("Product uploaded successfully");
-          Get.back();
-          Get.snackbar(
-            "Success",
-            "Product has been listed successfully.",
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: AppColors.green.withValues(alpha: 0.8),
-            colorText: AppColors.white,
-          );
-        });
+    final user = await _userDb.getCurrentUser();
+    return _db.uploadProduct(
+      Product(
+        userId: user.userId,
+        id: "",
+        title: titleController.text,
+        subTitle: subTitleController.text,
+        description: descriptionController.text,
+        price: double.tryParse(priceController.text) ?? 0.0,
+        tag: _tags,
+        location: tradingAreaController.text,
+        thumbnailImageUrl: imageDownloadLinks[_thumbnailIndex ?? 0],
+        createdAt: DateTime.now(),
+        imageUrls: imageDownloadLinks,
+      ),
+    );
   }
 }

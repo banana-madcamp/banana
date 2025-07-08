@@ -17,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
 
 import '../datas/local/tags.dart';
@@ -327,6 +328,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
                             .toList(),
                       )
                       .then((tags) {
+                        log.i("Image Labeled Tags: $tags");
                         List<int> errorIndexes = [];
                         final List<String> convertedTags =
                             _tags.map((e) => Tags().getEnglishTag(e)).toList();
@@ -347,16 +349,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
                             _thumbnailIndex != null) {
                           upload().then((value) {
                             log.i("Product uploaded successfully");
-                            Get.back();
-                            Get.snackbar(
-                              "Success",
-                              "Product has been listed successfully.",
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: AppColors.green.withValues(
-                                alpha: 0.8,
-                              ),
-                              colorText: AppColors.white,
-                            );
+                            Get.back(result: true);
                           });
                         } else {
                           String errorHeader = "Unsuccessful submission";
@@ -672,14 +665,18 @@ class _MainProductAddViewState extends State<MainProductAddView> {
   }
 
   Future<void> upload() async {
-    List<String> imageDownloadLinks = await _db.uploadImages(
-      _productImages.map((image) => image.image.path).toList(),
-    );
     final user = await _userDb.getCurrentUser();
+    var uuid = Uuid();
+    String productId = uuid.v4();
+
+    List<String> imageDownloadLinks = await _db.uploadImages(
+      productId,
+      _productImages.map((image) => File(image.image.path)).toList(),
+    );
     return _db.uploadProduct(
       Product(
         userId: user.userId,
-        id: "",
+        id: productId,
         title: titleController.text,
         subTitle: subTitleController.text,
         description: descriptionController.text,

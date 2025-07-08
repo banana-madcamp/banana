@@ -1,8 +1,14 @@
+import 'dart:ffi';
+import 'dart:io';
 
 import 'package:banana/main/bindings/main_initial_bindings.dart';
+import 'package:banana/main/datas/source/database_source.dart';
 import 'package:banana/main/views/main_location_view.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 import '../../utils/values/app_colors.dart';
 import '../../utils/values/app_icons.dart';
@@ -63,9 +69,8 @@ class _MainViewState extends State<MainView>
         icon: Icon(AppIcons.add, size: 32, color: AppColors.white),
         activeColorPrimary: AppColors.primary,
         inactiveColorPrimary: CupertinoColors.systemGrey,
-        onPressed: (context) {
-          Get.to(() => MainProductAddView(),
-               transition: Transition.downToUp);
+        onPressed: (context) async {
+          Get.to(() => MainProductAddView(), transition: Transition.downToUp);
         },
       ),
       PersistentBottomNavBarItem(

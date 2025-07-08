@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:banana/utils/values/app_assets.dart';
 import 'package:banana/utils/values/app_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +24,7 @@ class _MainHomeViewState extends State<MainHomeView> {
   late Logger log;
   late DatabaseSource db;
   bool _loading = true;
+  late StreamSubscription _productsSubscription;
 
   List<Product> dummyProducts = [
     for (int i = 0; i < 5; i++)
@@ -37,7 +39,7 @@ class _MainHomeViewState extends State<MainHomeView> {
         tag: ['dummy'],
         location: '대전 유성구',
         createdAt: DateTime.now(),
-        imageUrls: []
+        imageUrls: [],
       ),
   ];
 
@@ -47,21 +49,26 @@ class _MainHomeViewState extends State<MainHomeView> {
     log = Get.find<Logger>(tag: 'MainLogger');
     products = dummyProducts;
     db = Get.find<DatabaseSource>();
-    db
-        .fetchItems()
-        .then((value) {
-          setState(() {
-            _loading = false;
-            products = value;
-          });
-        })
-        .catchError((error) {
-          setState(() {
-            _loading = false;
-            products = [];
-          });
-          log.e('Error fetching data: $error');
+    _productsSubscription = db.fetchItems().listen(
+      (productsFromDb) {
+        setState(() {
+          products = productsFromDb;
+          _loading = false;
         });
+      },
+      onError: (error) {
+        log.e('Error fetching products: $error');
+        setState(() {
+          _loading = true;
+        });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _productsSubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -103,7 +110,7 @@ class _MainHomeViewState extends State<MainHomeView> {
             colors: [
               AppColors.white,
               AppColors.white,
-              AppColors.primary.withOpacity(0.4),
+              AppColors.primary.withValues(alpha: 0.4),
             ],
           ),
         ),
@@ -143,7 +150,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               image: DecorationImage(
-                                image: AssetImage(AppAssets.banana),
+                                image: NetworkImage(product.thumbnailImageUrl),
                                 fit: BoxFit.cover,
                               ),
                             ),

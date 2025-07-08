@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:banana/main/models/product.dart';
@@ -6,12 +7,6 @@ import '../source/database_source.dart';
 
 class DatabaseSourceDummy extends DatabaseSource {
   @override
-  Future<void> deleteData() {
-    // TODO: implement deleteData
-    throw UnimplementedError();
-  }
-
-  @override
   Future<void> uploadProduct(Product product) {
     return Future.delayed(const Duration(seconds: 5), () {
       return true;
@@ -19,33 +14,32 @@ class DatabaseSourceDummy extends DatabaseSource {
   }
 
   @override
-  Future<List<Product>> fetchItems() {
-    return Future.delayed(const Duration(seconds: 5), () {
-      return [
-        for (int i = 0; i < 10; i++)
-          Product(
-            id: "$i",
-            title: 'Banana Chips - lorem ipsum dolor sit amet, consectetur',
-            description: 'This is a dummy product description.',
-            price: pow(10, i).toDouble(),
-            thumbnailImageUrl: 'https://via.placeholder.com/150',
-            userId: '',
-            subTitle: 'this is a dummy product sub title',
-            tag: ['dummy'],
-            location: '대전 유성구',
-            createdAt: DateTime.now(),
-            imageUrls: ['https://via.placeholder.com/150'],
-          ),
-      ];
-    });
+  Future<void> deleteProduct(String productId) {
+    // TODO: implement deleteProduct
+    throw UnimplementedError();
   }
 
   @override
-  Future<List<String>> uploadImages(List<String> imagePaths) {
-    return Future.delayed(const Duration(seconds: 5), () {
-      return imagePaths
-          .map((path) => 'https://via.placeholder.com/150')
-          .toList();
-    });
+  Future<void> editProduct(String productId, Product product) {
+    // TODO: implement editProduct
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> purchaseProduct(String productId, String userId) {
+    // TODO: implement purchaseProduct
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<String>> uploadImages(String productId, List<File> images) {
+    // TODO: implement uploadImages
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<Product>> fetchItems() {
+    // TODO: implement fetchItems
+    throw UnimplementedError();
   }
 }

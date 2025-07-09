@@ -20,15 +20,26 @@ class _SigninViewState extends State<SigninView> {
   final passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _isObscured = true;
+  bool _isLoading = false;
 
   UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
 
   @override
   void initState() {
     super.initState();
+    _isLoading = true;
     _userDb.autoLogin().then((user) {
-      if (user == null) return;
+      if (user == null){
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
       Get.offAndToNamed(Routes.MAIN);
+    }).catchError((error){
+      setState(() {
+        _isLoading = false;
+      });
     });
   }
 
@@ -196,6 +207,9 @@ class _SigninViewState extends State<SigninView> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      setState(() {
+                        _isLoading = true;
+                      });
                       final email = emailController.text;
                       final password = passwordController.text;
 
@@ -204,6 +218,9 @@ class _SigninViewState extends State<SigninView> {
                       if (user != null) {
                         Get.offAndToNamed(Routes.MAIN);
                       } else {
+                        setState(() {
+                          _isLoading = false;
+                        });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("이메일 또는 비밀번호가 일치하지 않습니다")),
                         );
@@ -217,7 +234,10 @@ class _SigninViewState extends State<SigninView> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                  child: const Text(
+                  child: _isLoading ? CircularProgressIndicator(
+                    color: AppColors.white,
+                    strokeWidth: 2,
+                  ) : Text(
                     "Login",
                     style: TextStyle(
                       fontFamily: 'Rubik',
@@ -249,7 +269,7 @@ class _SigninViewState extends State<SigninView> {
                           recognizer:
                               TapGestureRecognizer()
                                 ..onTap = () {
-                                  Get.offAndToNamed(Routes.SIGNUP);
+                                  Get.offNamed(Routes.SIGNUP);
                                 },
                         ),
                       ],

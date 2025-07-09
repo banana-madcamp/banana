@@ -1,4 +1,3 @@
-import 'package:banana/customer/views/customer_page_view.dart';
 import 'package:banana/login/datas/source/user_database_source.dart';
 import 'package:banana/login/models/user.dart';
 import 'package:banana/main/models/product.dart';
@@ -6,6 +5,8 @@ import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../app_pages.dart';
 
 class ProductDetailView extends StatefulWidget {
   const ProductDetailView({super.key});
@@ -154,6 +155,18 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           
                                 return Image.network(
                                   imageUrl,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                              (loadingProgress.expectedTotalBytes ?? 1)
+                                            : null,
+                                        color: AppColors.primary,
+                                      ),
+                                    );
+                                  },
                                   height: 380,
                                   width: 380,
                                   fit: BoxFit.cover,
@@ -352,8 +365,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                 Expanded(
                                   child: ElevatedButton(
                                     onPressed: isSeller ? null : () {
-                                      Get.to(
-                                        () => const CustomerPageView(),
+                                      Get.toNamed(
+                                        Routes.CUSTOMER,
                                         arguments: product,
                                       );
                                     },

@@ -2,22 +2,26 @@ import 'dart:async';
 
 import 'package:banana/login/datas/source/user_database_source.dart';
 import 'package:banana/login/models/order.dart';
+import 'package:banana/login/models/paymentmethod.dart';
 import 'package:banana/login/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
 
+import '../../models/deliverymethod.dart';
+
 class UserDatabaseDataSourceImpl implements UserDatabaseSource {
   final _auth = FirebaseAuth.instance;
   final log = Logger();
   final _db = FirebaseFirestore.instance;
   final storage = FlutterSecureStorage();
-  
+
   final _likedProductsController = StreamController<List<String>>.broadcast();
-  
+
   @override
-  Stream<List<String>> get likedProductsStream => _likedProductsController.stream;
+  Stream<List<String>> get likedProductsStream =>
+      _likedProductsController.stream;
 
   @override
   Future<void> addOrder(String userId, Order order) {
@@ -60,8 +64,17 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
             profileImageUrl: '',
             orderHistory: [],
             sellingProducts: [],
-            paymentMethods: [],
-            deliveryMethods: [],
+            paymentMethods: [
+              PaymentMethod(type: "visa", details: "****-****-****-1234"),
+            ],
+            deliveryMethods: [
+              DeliveryMethod(
+                type: 'UPS',
+                description: 'Standard',
+                timeFrame: '3-5 days',
+                price: 3000,
+              ),
+            ],
             likedProductIds: [],
           );
 
@@ -190,7 +203,7 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
       if (user != null) {
         await user.updatePassword(newPassword);
         log.i('Password changed successfully');
-      } 
+      }
     } catch (error) {
       log.e('Error changing password: $error');
       rethrow;
@@ -200,9 +213,7 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
   @override
   Future<void> updateUserLocation(String userId, String location) async {
     try {
-      await _db.collection('users').doc(userId).update({
-        'location': location,
-      });
+      await _db.collection('users').doc(userId).update({'location': location});
       log.i('User location updated successfully');
     } catch (error) {
       log.e('Error updating user location: $error');
@@ -229,9 +240,7 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
   @override
   Future<void> updateUserNickName(String userId, String nickname) async {
     try {
-      await _db.collection('users').doc(userId).update({
-        'nickname': nickname,
-      });
+      await _db.collection('users').doc(userId).update({'nickname': nickname});
       log.i('User nickname updated successfully');
     } catch (error) {
       log.e('Error updating user nickname: $error');
@@ -248,7 +257,7 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
           'likedProductIds': FieldValue.arrayUnion([productId]),
         });
         log.i('Product liked successfully: $productId');
-        
+
         final updatedLikes = await getLikedProducts();
         _likedProductsController.add(updatedLikes);
       }
@@ -267,7 +276,7 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
           'likedProductIds': FieldValue.arrayRemove([productId]),
         });
         log.i('Product unliked successfully: $productId');
-        
+
         final updatedLikes = await getLikedProducts();
         _likedProductsController.add(updatedLikes);
       }
@@ -284,7 +293,7 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
       return currentUser.likedProductIds.contains(productId);
     } catch (error) {
       log.e('Error checking like status: $error');
-      return false;    
+      return false;
     }
   }
 

@@ -1,9 +1,9 @@
 import 'package:banana/bindings/initial_bindings.dart';
-import 'package:banana/splash/views/splash_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'app_pages.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
@@ -26,13 +26,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      getPages: AppPages.routes,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       initialBinding: InitialBindings(),
-      home: const SplashView(),
+      initialRoute: Routes.SPLASH,
     );
   }
 }

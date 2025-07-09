@@ -1,9 +1,10 @@
-import 'package:banana/main/views/tag_search_dialog.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../app_pages.dart';
 
 class TagItemList extends StatefulWidget {
   const TagItemList({super.key});
@@ -35,8 +36,8 @@ class _TagItemListState extends State<TagItemList> {
             ),
           AddTagItem(
             onPress: () async {
-              final List<String> result = await Get.to(
-                () => TagSearchDialog(),
+              final List<String> result = await Get.toNamed(
+                Routes.TAGSEARCH,
                 preventDuplicates: false,
               );
               final List<String> addTags = [];

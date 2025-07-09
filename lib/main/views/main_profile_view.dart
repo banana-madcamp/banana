@@ -1,10 +1,7 @@
 import 'package:banana/login/datas/source/user_database_source.dart';
 import 'package:banana/login/models/user.dart';
-import 'package:banana/login/views/signin_view.dart';
-import 'package:banana/splash/views/splash_view.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -291,14 +288,47 @@ class _MainProfileViewState extends State<MainProfileView> {
                         _buildMenuItem(
                           icon: AppIcons.sales,
                           label: "My Sales",
-                          onTap: () {},
+                          onTap: () async {
+                            final user = await _userDb.getCurrentUser();
+                            Get.dialog(
+                              AlertDialog(
+                                title: Text('My Sales'),
+                                content: Container(
+                                  height: 400,
+                                  width: 300,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListView(
+                                    children: [
+                                      for (var product in user.sellingProducts)
+                                        ListTile(
+                                          title: Text(
+                                            "상품 번호 : ${product.id}",
+                                          ),
+                                          subtitle: Text(product.title),
+                                          trailing: Text(
+                                            'Total: ${NumberFormat('###,###,###').format(product.price)}원',
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: const Text('확인'),
+                                    onPressed: () => Get.back(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                         _buildMenuItem(
                           icon: AppIcons.shoppingBag,
                           label: "My Order",
                           onTap: () async {
                             final user = await _userDb.getCurrentUser();
-                            log.e(user.orderHistory);
                             Get.dialog(
                               AlertDialog(
                                 title: Text('My Order'),

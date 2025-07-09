@@ -49,6 +49,20 @@ class DatabaseSourceImpl extends DatabaseSource {
         .set(product.toJson())
         .then((_) {
           log.i('Product uploaded successfully: ${product.id}');
+          _db
+              .collection('users')
+              .doc(product.userId)
+              .update({
+                'sellingProducts': FieldValue.arrayUnion([product.toJson()]),
+              })
+              .then((_) {
+                log.i(
+                  'Product added to user selling products: ${product.userId}',
+                );
+              })
+              .catchError((error) {
+                log.e('Failed to update user selling products: $error');
+              });
         })
         .catchError((error) {
           log.e('Failed to upload product: $error');

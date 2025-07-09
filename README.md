@@ -40,6 +40,7 @@
 - **구매 페이지**  
   - 배송지, 결제수단, 배송방법 선택  
   - 총 결제 금액 확인 및 주문 확정 가능
+
   ![Image](https://github.com/user-attachments/assets/964f5146-85ae-4219-8248-b47ac48373fc)
 
 - **좋아요 기능**  
@@ -50,7 +51,7 @@
 - **마이페이지**  
   - 사용자 정보 확인, 거래 내역, 로그아웃 등 기본 설정
   
-  [Image](https://github.com/user-attachments/assets/186a75d7-9361-44d8-a07d-d68df1b5c553)
+  ![Image](https://github.com/user-attachments/assets/186a75d7-9361-44d8-a07d-d68df1b5c553)
 
 ---
 

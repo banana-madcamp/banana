@@ -185,7 +185,10 @@ class _CustomerPageViewState extends State<CustomerPageView> {
                   ),
                   subtitle: Text(delivery.timeFrame),
                   trailing: Text(
-                    '\$${delivery.price.toStringAsFixed(2)}',
+                    '${delivery.price.toInt().toString().replaceAllMapped(
+                      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+                      (Match m) => '${m[1]},',
+                    )} 원',
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   onTap: () {

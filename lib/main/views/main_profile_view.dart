@@ -4,8 +4,11 @@ import 'package:banana/login/views/signin_view.dart';
 import 'package:banana/splash/views/splash_view.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 import '../../app_pages.dart';
 
@@ -18,6 +21,7 @@ class MainProfileView extends StatefulWidget {
 
 class _MainProfileViewState extends State<MainProfileView> {
   late Future<User> _userFuture;
+  final log = Logger();
 
   UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
 
@@ -83,10 +87,7 @@ class _MainProfileViewState extends State<MainProfileView> {
               ),
             ),
             actions: [
-              TextButton(
-                onPressed: () => Get.back(),
-                child: const Text('취소'),
-              ),
+              TextButton(onPressed: () => Get.back(), child: const Text('취소')),
               ElevatedButton(
                 onPressed: () async {
                   try {
@@ -125,10 +126,7 @@ class _MainProfileViewState extends State<MainProfileView> {
               ),
             ),
             actions: [
-              TextButton(
-                onPressed: () => Get.back(),
-                child: const Text('취소'),
-              ),
+              TextButton(onPressed: () => Get.back(), child: const Text('취소')),
               ElevatedButton(
                 onPressed: () async {
                   try {
@@ -171,10 +169,7 @@ class _MainProfileViewState extends State<MainProfileView> {
               style: TextStyle(fontFamily: 'Rubik'),
             ),
             actions: [
-              TextButton(
-                onPressed: () => Get.back(),
-                child: const Text('취소'),
-              ),
+              TextButton(onPressed: () => Get.back(), child: const Text('취소')),
               ElevatedButton(
                 onPressed: () async {
                   try {
@@ -301,7 +296,42 @@ class _MainProfileViewState extends State<MainProfileView> {
                         _buildMenuItem(
                           icon: AppIcons.shoppingBag,
                           label: "My Order",
-                          onTap: () {},
+                          onTap: () async {
+                            final user = await _userDb.getCurrentUser();
+                            log.e(user.orderHistory);
+                            Get.dialog(
+                              AlertDialog(
+                                title: Text('My Order'),
+                                content: Container(
+                                  height: 400,
+                                  width: 300,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListView(
+                                    children: [
+                                      for (var order in user.orderHistory)
+                                        ListTile(
+                                          title: Text(
+                                            "주문 번호 : ${order.orderId}",
+                                          ),
+                                          subtitle: Text(order.product.title),
+                                          trailing: Text(
+                                            'Total: ${NumberFormat('###,###,###').format(order.product.price)}원',
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: const Text('확인'),
+                                    onPressed: () => Get.back(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                         _buildMenuItem(
                           icon: AppIcons.location,

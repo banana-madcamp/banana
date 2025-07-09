@@ -13,6 +13,11 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
   final log = Logger();
   final _db = FirebaseFirestore.instance;
   final storage = FlutterSecureStorage();
+  
+  final _likedProductsController = StreamController<List<String>>.broadcast();
+  
+  @override
+  Stream<List<String>> get likedProductsStream => _likedProductsController.stream;
 
   @override
   Future<void> addOrder(String userId, Order order) {
@@ -57,6 +62,7 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
             sellingProducts: [],
             paymentMethods: [],
             deliveryMethods: [],
+            likedProductIds: [],
           );
 
           final User returnUser = await _db
@@ -231,5 +237,69 @@ class UserDatabaseDataSourceImpl implements UserDatabaseSource {
       log.e('Error updating user nickname: $error');
       rethrow;
     }
+  }
+
+  @override
+  Future<void> addLike(String productId) async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        await _db.collection('users').doc(user.uid).update({
+          'likedProductIds': FieldValue.arrayUnion([productId]),
+        });
+        log.i('Product liked successfully: $productId');
+        
+        final updatedLikes = await getLikedProducts();
+        _likedProductsController.add(updatedLikes);
+      }
+    } catch (error) {
+      log.e('Error adding like: $error');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeLike(String productId) async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        await _db.collection('users').doc(user.uid).update({
+          'likedProductIds': FieldValue.arrayRemove([productId]),
+        });
+        log.i('Product unliked successfully: $productId');
+        
+        final updatedLikes = await getLikedProducts();
+        _likedProductsController.add(updatedLikes);
+      }
+    } catch (error) {
+      log.e('Error removing like: $error');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> isLiked(String productId) async {
+    try {
+      final currentUser = await getCurrentUser();
+      return currentUser.likedProductIds.contains(productId);
+    } catch (error) {
+      log.e('Error checking like status: $error');
+      return false;    
+    }
+  }
+
+  @override
+  Future<List<String>> getLikedProducts() async {
+    try {
+      final currentUser = await getCurrentUser();
+      return currentUser.likedProductIds;
+    } catch (error) {
+      log.e('Error fetching liked products: $error');
+      return [];
+    }
+  }
+
+  void dispose() {
+    _likedProductsController.close();
   }
 }

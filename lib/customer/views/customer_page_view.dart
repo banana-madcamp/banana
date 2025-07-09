@@ -621,7 +621,10 @@ class _CustomerPageViewState extends State<CustomerPageView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "\$${deliveryMethod.price.toStringAsFixed(2)}",
+                  "${deliveryMethod.price.toInt().toString().replaceAllMapped(
+                      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+                      (Match m) => '${m[1]},',
+                    )} 원",
                   style: TextStyle(
                     fontFamily: 'Rubik',
                     fontSize: 14,
@@ -707,11 +710,20 @@ class _CustomerPageViewState extends State<CustomerPageView> {
       ),
       child: Column(
         children: [
-          _buildSummaryRow("Order:", "\$ ${orderAmount.toStringAsFixed(2)}"),
+          _buildSummaryRow("Order:", "${orderAmount.toInt().toString().replaceAllMapped(
+            RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+            (Match m) => '${m[1]},',
+          )} 원"),
           const SizedBox(height: 12),
-          _buildSummaryRow("Delivery:", "\$ ${deliveryPrice.toStringAsFixed(2)}"),
+          _buildSummaryRow("Delivery:", "${deliveryPrice.toInt().toString().replaceAllMapped(
+            RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+            (Match m) => '${m[1]},',
+          )} 원"),
           const SizedBox(height: 12),
-          _buildSummaryRow("Total:", "\$ ${totalAmount.toStringAsFixed(2)}", isTotal: true),
+          _buildSummaryRow("Total:", "${totalAmount.toInt().toString().replaceAllMapped(
+            RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+            (Match m) => '${m[1]},',
+          )} 원", isTotal: true),
           const SizedBox(height: 12),
         ],
       ),

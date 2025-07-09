@@ -28,6 +28,16 @@ abstract class UserDatabaseSource {
   Future<User?> getUserById(String userId);
 
   Future<void> updateUserNickName(String userId, String nickname);
+
+  Future<void> addLike(String productId);
+
+  Future<void> removeLike(String productId);
+
+  Future<bool> isLiked(String productId);
+
+  Future<List<String>> getLikedProducts();
+
+  Stream<List<String>> get likedProductsStream;
   // 로그아웃 메서드
   Future<void> logout();
 }

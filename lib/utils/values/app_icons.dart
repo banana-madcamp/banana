@@ -25,4 +25,5 @@ class AppIcons{
   static const IconData invisible = Icons.visibility_off_outlined;
   static const IconData close = Icons.close;
   static const IconData price = Icons.attach_money;
+  static const IconData tune = Icons.tune;
 }

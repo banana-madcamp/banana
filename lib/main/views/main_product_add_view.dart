@@ -75,6 +75,7 @@ class _MainProductAddViewState extends State<MainProductAddView> {
   Widget subTitleTextField() {
     return TextFormField(
       validator: InformationValidator.validateSubtitle,
+      controller: subTitleController,
       decoration: InputDecoration(
         labelStyle: TextStyle(
           fontSize: 14,

@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:banana/utils/values/app_assets.dart';
 import 'package:banana/utils/values/app_icons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -22,10 +25,15 @@ class MainHomeView extends StatefulWidget {
 
 class _MainHomeViewState extends State<MainHomeView> {
   List<Product> products = [];
+  List<Product> _filteredProducts = [];
   late Logger log;
   late DatabaseSource db;
   bool _loading = true;
   late StreamSubscription _productsSubscription;
+  bool _searching = false;
+  final SearchController _searchController = SearchController();
+  DateTime? _selectedDate;
+  DateTime? targetDate;
 
   List<Product> dummyProducts = [
     for (int i = 0; i < 5; i++)
@@ -75,34 +83,270 @@ class _MainHomeViewState extends State<MainHomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Center(
-          child: Row(
-            children: [
-              const SizedBox(width: 16),
-              Image.asset(width: 32, height: 32, AppAssets.logo),
-            ],
-          ),
-        ),
-        titleSpacing: 8,
-        title: const Text(
-          'Banana Market',
-          style: TextStyle(
-            fontSize: 24,
-            fontFamily: 'Rubik',
-            fontWeight: FontWeight.bold,
-            color: AppColors.black,
-          ),
-        ),
-        backgroundColor: AppColors.white,
-        centerTitle: false,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(AppIcons.search, size: 24, color: AppColors.black),
-          ),
-        ],
-      ),
+      appBar:
+          _searching
+              ? AppBar(
+                actions: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: IconButton(
+                      onPressed: () {
+                        showCupertinoDialog(
+                          barrierDismissible: true,
+                          context: context,
+                          builder: (context) {
+                            return Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                height: 450,
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {},
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        overlayColor:
+                                            WidgetStateColor.resolveWith(
+                                              (states) => AppColors.transparent,
+                                            ),
+                                      ),
+                                      child: Text(
+                                        "최소 날짜 선택",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 300,
+                                      child: CupertinoDatePicker(
+                                        mode: CupertinoDatePickerMode.date,
+                                        dateOrder: DatePickerDateOrder.ymd,
+                                        onDateTimeChanged: (DateTime value) {
+                                          targetDate = value;
+                                        },
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        CupertinoButton(
+                                          child: Text(
+                                            "확인",
+                                            style: TextStyle(
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            _selectedDate = targetDate;
+                                            setState(() {
+                                              _filteredProducts =
+                                                  products.where((product) {
+                                                    for (final tag
+                                                        in product.tag) {
+                                                      if (tag
+                                                              .toLowerCase()
+                                                              .contains(
+                                                                _searchController
+                                                                    .text
+                                                                    .toLowerCase(),
+                                                              ) &&
+                                                          _selectedDate ==
+                                                              null) {
+                                                        return true;
+                                                      } else if (tag
+                                                              .toLowerCase()
+                                                              .contains(
+                                                                _searchController
+                                                                    .text
+                                                                    .toLowerCase(),
+                                                              ) &&
+                                                          _selectedDate !=
+                                                              null) {
+                                                        if (product.createdAt
+                                                            .isAfter(
+                                                              _selectedDate!,
+                                                            )) {
+                                                          return true;
+                                                        }
+                                                        return false;
+                                                      }
+                                                    }
+                                                    return false;
+                                                  }).toList();
+                                              Get.back();
+                                            });
+                                          },
+                                        ),
+                                        CupertinoButton(
+                                          child: Text(
+                                            "취소",
+                                            style: TextStyle(
+                                              color: AppColors.gray,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Get.back();
+                                            setState(() {
+                                              _selectedDate = null;
+                                              _filteredProducts =
+                                                  products.where((product) {
+                                                    for (final tag
+                                                        in product.tag) {
+                                                      if (tag
+                                                          .toLowerCase()
+                                                          .contains(
+                                                            _searchController
+                                                                .text
+                                                                .toLowerCase(),
+                                                          )) {
+                                                        return true;
+                                                      }
+                                                    }
+                                                    return false;
+                                                  }).toList();
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        AppIcons.tune,
+                        size: 30,
+                        color: AppColors.white,
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 26),
+                ],
+                backgroundColor: AppColors.white,
+                title: Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: SearchBar(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        _filteredProducts =
+                            products.where((product) {
+                              for (final tag in product.tag) {
+                                if (tag.toLowerCase().contains(
+                                      value.toLowerCase(),
+                                    ) &&
+                                    _selectedDate == null) {
+                                  return true;
+                                } else if (tag.toLowerCase().contains(
+                                      value.toLowerCase(),
+                                    ) &&
+                                    _selectedDate != null) {
+                                  if (product.createdAt.isAfter(
+                                    _selectedDate!,
+                                  )) {
+                                    return true;
+                                  }
+                                  return false;
+                                }
+                              }
+                              return false;
+                            }).toList();
+                      });
+                    },
+                    shape: WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    backgroundColor: WidgetStatePropertyAll(
+                      AppColors.lightGray,
+                    ),
+                    textStyle: WidgetStatePropertyAll(
+                      TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    hintText: "Search...",
+                    hintStyle: WidgetStatePropertyAll(
+                      TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.gray,
+                      ),
+                    ),
+                    elevation: WidgetStatePropertyAll(0),
+                    leading: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _searchController.text = "";
+                          _filteredProducts = [];
+                          _searching = false;
+                        });
+                      },
+                      icon: Icon(AppIcons.search),
+                    ),
+                  ),
+                ),
+              )
+              : AppBar(
+                leading: Center(
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 16),
+                      Image.asset(width: 32, height: 32, AppAssets.logo),
+                    ],
+                  ),
+                ),
+                titleSpacing: 8,
+                title: const Text(
+                  'Banana Market',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontFamily: 'Rubik',
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                backgroundColor: AppColors.white,
+                centerTitle: false,
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _searching = true;
+                      });
+                    },
+                    icon: Icon(
+                      AppIcons.search,
+                      size: 24,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ],
+              ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -120,14 +364,17 @@ class _MainHomeViewState extends State<MainHomeView> {
           enableSwitchAnimation: true,
           child: ListView.builder(
             itemBuilder: (context, index) {
-              final product = products[index];
+              final product =
+                  _searchController.text == "" && _selectedDate == null
+                      ? products[index]
+                      : _filteredProducts[index];
               return Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 27.5,
                   vertical: 10,
                 ),
                 child: GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     Get.to(() => ProductDetailView(), arguments: product);
                   },
                   child: Container(
@@ -155,7 +402,9 @@ class _MainHomeViewState extends State<MainHomeView> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 image: DecorationImage(
-                                  image: NetworkImage(product.thumbnailImageUrl),
+                                  image: CachedNetworkImageProvider(
+                                    product.thumbnailImageUrl,
+                                  ),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -208,7 +457,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "${NumberFormat('#,##,###').format(product.price)} 원",
+                                      "${NumberFormat('###,###,###,###').format(product.price)} 원",
                                       style: const TextStyle(
                                         fontFamily: 'Inter',
                                         fontSize: 16,
@@ -237,7 +486,10 @@ class _MainHomeViewState extends State<MainHomeView> {
                 ),
               );
             },
-            itemCount: products.length,
+            itemCount:
+                _searchController.text == "" && _selectedDate == null
+                    ? products.length
+                    : _filteredProducts.length,
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:banana/splash/views/splash_bottom_button.dart';
 import 'package:banana/utils/values/app_assets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 
 import '../../login/views/signup_view.dart';
@@ -18,6 +19,9 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState(){
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      FlutterNativeSplash.remove();
+    });
   }
 
   @override

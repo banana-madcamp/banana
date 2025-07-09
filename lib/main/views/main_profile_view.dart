@@ -324,7 +324,7 @@ class _MainProfileViewState extends State<MainProfileView> {
                                   ),
                                 ),
                                 actions: [
-                                  CupertinoDialogAction(
+                                  TextButton(
                                     child: const Text('확인'),
                                     onPressed: () => Get.back(),
                                   ),

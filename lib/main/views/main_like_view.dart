@@ -129,7 +129,6 @@ class _MainLikeViewState extends State<MainLikeView> {
                   ),
                 ),
               ),
-              const SizedBox(width: 20),
             ],
           ),
         ),

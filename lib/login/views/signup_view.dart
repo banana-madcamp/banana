@@ -6,8 +6,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'signin_view.dart';
-
 class SignupView extends StatefulWidget {
   const SignupView({super.key});
 

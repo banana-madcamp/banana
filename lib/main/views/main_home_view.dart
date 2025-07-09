@@ -5,13 +5,12 @@ import 'package:banana/utils/values/app_icons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../customer/views/product_detail_page_view.dart';
+import '../../app_pages.dart';
 import '../../utils/values/app_colors.dart';
 import '../datas/source/database_source.dart';
 import '../models/product.dart';
@@ -375,7 +374,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                 ),
                 child: GestureDetector(
                   onTap: () {
-                    Get.to(() => ProductDetailView(), arguments: product);
+                    Get.toNamed(Routes.PRODUCTDETAIL, arguments: product);
                   },
                   child: Container(
                     width: 320,
@@ -396,17 +395,20 @@ class _MainHomeViewState extends State<MainHomeView> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
-                            child: Container(
-                              width: 68,
-                              height: 68,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                  image: CachedNetworkImageProvider(
-                                    product.thumbnailImageUrl,
-                                  ),
-                                  fit: BoxFit.cover,
-                                ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CachedNetworkImage(
+                                width: 68,
+                                height: 68,
+                                fit: BoxFit.cover,
+                                imageUrl: product.thumbnailImageUrl,
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) => Center(
+                                      child: CircularProgressIndicator(
+                                        value: downloadProgress.progress,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
                               ),
                             ),
                           ),

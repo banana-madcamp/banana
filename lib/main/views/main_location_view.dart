@@ -5,6 +5,16 @@ class MainLocationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Center(
+      child: Text(
+        'Location View\n 개발 중',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: CupertinoColors.black,
+        ),
+      ),
+    );
   }
 }

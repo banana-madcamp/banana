@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:banana/main/models/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:logger/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -16,21 +14,17 @@ class DatabaseSourceImpl extends DatabaseSource {
 
   @override
   Stream<List<Product>> fetchItems() {
-    return _db
-        .collection('items')
-        .snapshots()
-        .map((snapshot) {
-          List<Product> products =
-              snapshot.docs.map((doc) {
-                return Product.fromJson(doc.data());
-              }).toList();
-          products.sort(
-            (a, b) => b.createdAt.compareTo(
-              a.createdAt,
-            ), // Sort by createdAt descending
-          );
-          return products;
-        });
+    return _db.collection('items').snapshots().map((snapshot) {
+      List<Product> products =
+          snapshot.docs.map((doc) {
+            return Product.fromJson(doc.data());
+          }).toList();
+      products.sort(
+        (a, b) =>
+            b.createdAt.compareTo(a.createdAt), // Sort by createdAt descending
+      );
+      return products;
+    });
   }
 
   @override
@@ -93,8 +87,13 @@ class DatabaseSourceImpl extends DatabaseSource {
   }
 
   @override
-  Future<void> purchaseProduct(String productId, String userId) {
-    // TODO: implement purchaseProduct
-    throw UnimplementedError();
+  Future<void> purchaseProduct(String productId, String userId) async {
+    ;
+    _db.collection('items').doc(productId).get().then((doc) {
+      if (doc.exists) {
+        _db.collection('purchased_items').doc(productId).set(doc.data()!);
+        deleteProduct(productId);
+      }
+    });
   }
 }

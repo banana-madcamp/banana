@@ -1,21 +1,13 @@
-import 'dart:ffi';
-import 'dart:io';
-
-import 'package:banana/main/bindings/main_initial_bindings.dart';
-import 'package:banana/main/datas/source/database_source.dart';
 import 'package:banana/main/views/main_location_view.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
 
+import '../../app_pages.dart';
 import '../../utils/values/app_colors.dart';
 import '../../utils/values/app_icons.dart';
 import '../../utils/widgets/persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'main_home_view.dart';
 import 'main_like_view.dart';
-import 'main_product_add_view.dart';
 import 'main_profile_view.dart';
 
 class MainView extends StatefulWidget {
@@ -34,7 +26,6 @@ class _MainViewState extends State<MainView>
   @override
   void initState() {
     super.initState();
-    MainInitialBindings().dependencies();
   }
 
   List<Widget> _buildScreens() {
@@ -70,7 +61,7 @@ class _MainViewState extends State<MainView>
         activeColorPrimary: AppColors.primary,
         inactiveColorPrimary: CupertinoColors.systemGrey,
         onPressed: (context) async {
-          Get.to(() => MainProductAddView(), transition: Transition.downToUp);
+          Get.toNamed(Routes.PRODUCTADD);
         },
       ),
       PersistentBottomNavBarItem(

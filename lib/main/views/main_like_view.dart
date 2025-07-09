@@ -1,16 +1,18 @@
 import 'dart:async';
 
-import 'package:banana/customer/views/product_detail_page_view.dart';
 import 'package:banana/login/datas/source/user_database_source.dart';
 import 'package:banana/main/datas/source/database_source.dart';
 import 'package:banana/main/models/product.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+
+import '../../app_pages.dart';
 
 class MainLikeView extends StatefulWidget {
   const MainLikeView({super.key});
@@ -26,7 +28,7 @@ class _MainLikeViewState extends State<MainLikeView> {
   late UserDatabaseSource userDb;
   bool _loading = true;
   late StreamSubscription _allProductsSubscription;
-  late StreamSubscription _likedProductsSubscription; 
+  late StreamSubscription _likedProductsSubscription;
 
   @override
   void initState() {
@@ -36,9 +38,9 @@ class _MainLikeViewState extends State<MainLikeView> {
     userDb = Get.find<UserDatabaseSource>();
 
     _loadLikedProducts();
-    
+
     _allProductsSubscription = db.fetchItems().listen(
-      (allProducts) async  {
+      (allProducts) async {
         await _loadLikedProducts();
       },
       onError: (error) {
@@ -64,7 +66,7 @@ class _MainLikeViewState extends State<MainLikeView> {
     super.didChangeDependencies();
     if (mounted) {
       _loadLikedProducts();
-  }
+    }
   }
 
   void refreshLikedProducts() {
@@ -75,10 +77,11 @@ class _MainLikeViewState extends State<MainLikeView> {
     try {
       final allProducts = await db.fetchItems().first;
       final likedProductIds = await userDb.getLikedProducts();
-      
-      final filteredProducts = allProducts
-          .where((product) => likedProductIds.contains(product.id))
-          .toList();
+
+      final filteredProducts =
+          allProducts
+              .where((product) => likedProductIds.contains(product.id))
+              .toList();
 
       if (mounted) {
         setState(() {
@@ -107,120 +110,109 @@ class _MainLikeViewState extends State<MainLikeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        "Liked Products",
-                        style: TextStyle(
-                          fontFamily: 'Rubik',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 25,
-                          color: AppColors.black,
-                        ),
-                      ),
+      appBar: AppBar(
+        backgroundColor: AppColors.white,
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Row(
+            children: [
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    "Liked Products",
+                    style: TextStyle(
+                      fontFamily: 'Rubik',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 25,
+                      color: AppColors.black,
                     ),
-                  ),
-                  const SizedBox(width: 20),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.white,
-                      AppColors.white,
-                      AppColors.primary.withValues(alpha: 0.4),
-                    ],
                   ),
                 ),
-                child: likedProducts.isEmpty && !_loading
-                    ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.heart,
-                            size: 80,
-                            color: AppColors.iconGray,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No liked products',
-                            style: TextStyle(
-                              fontFamily: 'Rubik',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.iconGray,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Add liked products to see them here',
-                            style: TextStyle(
-                              fontFamily: 'Rubik',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.iconGray,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                    : Skeletonizer(
-                      enabled: _loading,
-                      enableSwitchAnimation: true,
-                      child: ListView.builder(
-                        itemBuilder: (context, index) {
-                          if (_loading) {
-                            final dummyProduct = Product(
-                                id: 'dummy',
-                                title: 'Loading Product...',
-                                description: 'Loading description...',
-                                price: 0,
-                                thumbnailImageUrl: '',
-                                userId: '',
-                                subTitle: 'Loading subtitle...',
-                                tag: ['loading'],
-                                location: 'Loading location...',
-                                createdAt: DateTime.now(),
-                                imageUrls: [],
-                              );
-                              return _buildProductItem(dummyProduct);
-                          }
-                          final product = likedProducts[index];
-                          return _buildProductItem(product);
-                        },
-                        itemCount: _loading ? 5 : likedProducts.length,
-                      ),
-                    ),
               ),
-            ),
-          ],
+              const SizedBox(width: 20),
+            ],
+          ),
         ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.white,
+              AppColors.white,
+              AppColors.primary.withValues(alpha: 0.4),
+            ],
+          ),
+        ),
+        child:
+            likedProducts.isEmpty && !_loading
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(AppIcons.heart, size: 80, color: AppColors.iconGray),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No liked products',
+                        style: TextStyle(
+                          fontFamily: 'Rubik',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.iconGray,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Add liked products to see them here',
+                        style: TextStyle(
+                          fontFamily: 'Rubik',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.iconGray,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                : Skeletonizer(
+                  enabled: _loading,
+                  enableSwitchAnimation: true,
+                  child: ListView.builder(
+                    itemBuilder: (context, index) {
+                      if (_loading) {
+                        final dummyProduct = Product(
+                          id: 'dummy',
+                          title: 'Loading Product...',
+                          description: 'Loading description...',
+                          price: 0,
+                          thumbnailImageUrl: '',
+                          userId: '',
+                          subTitle: 'Loading subtitle...',
+                          tag: ['loading'],
+                          location: 'Loading location...',
+                          createdAt: DateTime.now(),
+                          imageUrls: [],
+                        );
+                        return _buildProductItem(dummyProduct);
+                      }
+                      final product = likedProducts[index];
+                      return _buildProductItem(product);
+                    },
+                    itemCount: _loading ? 5 : likedProducts.length,
+                  ),
+                ),
       ),
     );
   }
 
   Widget _buildProductItem(Product product) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 27.5, vertical: 10,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 27.5, vertical: 10),
       child: GestureDetector(
         onTap: () async {
-          await Get.to(() => const ProductDetailView(), arguments: product);
+          await Get.toNamed(Routes.PRODUCTDETAIL, arguments: product);
           _loadLikedProducts();
         },
         child: Container(
@@ -228,42 +220,44 @@ class _MainLikeViewState extends State<MainLikeView> {
           height: 142,
           decoration: BoxDecoration(
             color: AppColors.lightGray,
-            borderRadius: BorderRadius.circular(10)
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(
-              left: 15,
-              right: 15,
-              top: 20,
-            ),
+            padding: const EdgeInsets.only(left: 15, right: 15, top: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: Container(
-                    width: 68,
-                    height: 68,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      image: product.thumbnailImageUrl.isNotEmpty
-                          ? DecorationImage(
-                            image: NetworkImage(product.thumbnailImageUrl),
-                            fit: BoxFit.cover,
-                          )
-                          : null,
-                      color: product.thumbnailImageUrl.isEmpty
-                          ? AppColors.gray.withAlpha(80)
-                          : null,
-                    ),
-                    child: product.thumbnailImageUrl.isEmpty
-                        ? Icon(
-                            Icons.image,
-                            color: AppColors.darkGray,
-                            size: 32,
-                          )
-                        : null,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child:
+                        product.thumbnailImageUrl.isEmpty
+                            ? Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.gray.withAlpha(80),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.image,
+                                color: AppColors.darkGray,
+                                size: 32,
+                              ),
+                            )
+                            : CachedNetworkImage(
+                              imageUrl: product.thumbnailImageUrl,
+                              width: 68,
+                              height: 68,
+                              fit: BoxFit.cover,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) => Center(
+                                    child: CircularProgressIndicator(
+                                      value: downloadProgress.progress,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                            ),
                   ),
                 ),
                 const SizedBox(width: 10),

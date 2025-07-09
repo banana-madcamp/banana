@@ -1,13 +1,11 @@
-import 'package:banana/login/datas/local/user_database_data_source_dummy.dart';
 import 'package:banana/login/datas/source/user_database_source.dart';
-import 'package:banana/login/views/signup_view.dart';
 import 'package:banana/utils/values/app_colors.dart';
 import 'package:banana/utils/values/app_icons.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../main/views/main_view.dart';
+import '../../app_pages.dart';
 
 class SigninView extends StatefulWidget {
   const SigninView({super.key});
@@ -22,18 +20,26 @@ class _SigninViewState extends State<SigninView> {
   final passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _isObscured = true;
+  bool _isLoading = false;
+
   UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
 
   @override
   void initState() {
     super.initState();
-    _userDb.autoLogin().then((user){
-      if(user == null) return;
-      Get.off(
-        () => const MainView(),
-        transition: Transition.rightToLeftWithFade,
-        duration: const Duration(milliseconds: 200),
-      );
+    _isLoading = true;
+    _userDb.autoLogin().then((user) {
+      if (user == null){
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+      Get.offAndToNamed(Routes.MAIN);
+    }).catchError((error){
+      setState(() {
+        _isLoading = false;
+      });
     });
   }
 
@@ -53,7 +59,11 @@ class _SigninViewState extends State<SigninView> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Sign In",
-                    style: TextStyle(fontFamily: 'Rubik', fontSize: 38, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontFamily: 'Rubik',
+                      fontSize: 38,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -71,14 +81,22 @@ class _SigninViewState extends State<SigninView> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Email",
-                    style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16,),
+                    style: TextStyle(
+                      fontFamily: 'Rubik',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 TextFormField(
                   controller: emailController,
                   decoration: InputDecoration(
                     hintText: "enter your email",
-                    hintStyle: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14,),
+                    hintStyle: const TextStyle(
+                      fontFamily: 'Rubik',
+                      color: AppColors.gray,
+                      fontSize: 14,
+                    ),
                     prefixIcon: const Icon(
                       AppIcons.email,
                       color: AppColors.gray,
@@ -105,7 +123,11 @@ class _SigninViewState extends State<SigninView> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Password",
-                    style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16),
+                    style: TextStyle(
+                      fontFamily: 'Rubik',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 TextFormField(
@@ -113,7 +135,11 @@ class _SigninViewState extends State<SigninView> {
                   obscureText: _isObscured,
                   decoration: InputDecoration(
                     hintText: "enter your password",
-                    hintStyle: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
+                    hintStyle: const TextStyle(
+                      fontFamily: 'Rubik',
+                      color: AppColors.gray,
+                      fontSize: 14,
+                    ),
                     prefixIcon: const Icon(
                       AppIcons.password,
                       color: AppColors.gray,
@@ -155,7 +181,11 @@ class _SigninViewState extends State<SigninView> {
                     ),
                     const Text(
                       "Remember Me",
-                      style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w400, fontSize: 12),
+                      style: TextStyle(
+                        fontFamily: 'Rubik',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                      ),
                     ),
                     const Spacer(),
                     TextButton(
@@ -177,18 +207,20 @@ class _SigninViewState extends State<SigninView> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      setState(() {
+                        _isLoading = true;
+                      });
                       final email = emailController.text;
                       final password = passwordController.text;
 
                       final user = await _userDb.findUser(email, password);
 
                       if (user != null) {
-                        Get.off(
-                          () => const MainView(),
-                          transition: Transition.rightToLeftWithFade,
-                          duration: const Duration(milliseconds: 200),
-                        );
+                        Get.offAndToNamed(Routes.MAIN);
                       } else {
+                        setState(() {
+                          _isLoading = false;
+                        });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("이메일 또는 비밀번호가 일치하지 않습니다")),
                         );
@@ -202,9 +234,16 @@ class _SigninViewState extends State<SigninView> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                  child: const Text(
+                  child: _isLoading ? CircularProgressIndicator(
+                    color: AppColors.white,
+                    strokeWidth: 2,
+                  ) : Text(
                     "Login",
-                    style: TextStyle(fontFamily: 'Rubik', color: AppColors.white, fontSize: 18),
+                    style: TextStyle(
+                      fontFamily: 'Rubik',
+                      color: AppColors.white,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -213,7 +252,11 @@ class _SigninViewState extends State<SigninView> {
                   child: RichText(
                     text: TextSpan(
                       text: "Don't have an account? ",
-                      style: const TextStyle(fontFamily: 'Rubik', color: AppColors.gray, fontSize: 14),
+                      style: const TextStyle(
+                        fontFamily: 'Rubik',
+                        color: AppColors.gray,
+                        fontSize: 14,
+                      ),
                       children: [
                         TextSpan(
                           text: "Sign up",
@@ -226,11 +269,7 @@ class _SigninViewState extends State<SigninView> {
                           recognizer:
                               TapGestureRecognizer()
                                 ..onTap = () {
-                                  Get.off(
-                                    () => const SignupView(),
-                                    transition: Transition.rightToLeftWithFade,
-                                    duration: const Duration(milliseconds: 200),
-                                  );
+                                  Get.offNamed(Routes.SIGNUP);
                                 },
                         ),
                       ],

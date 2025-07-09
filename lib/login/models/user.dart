@@ -14,6 +14,7 @@ class User {
   final List<Product> sellingProducts;
   final List<PaymentMethod> paymentMethods;
   final List<DeliveryMethod> deliveryMethods;
+  final List<String> likedProductIds;
 
   User({
   required this.userId,
@@ -26,6 +27,7 @@ class User {
   required this.sellingProducts,
   required this.paymentMethods,
   required this.deliveryMethods,
+  this.likedProductIds = const []
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -48,6 +50,9 @@ class User {
       deliveryMethods: (json['deliveryMethods'] as List<dynamic>)
           .map((e) => DeliveryMethod.fromJson(e as Map<String, dynamic>))
           .toList(),
+      likedProductIds: (json['likedProductIds'] as List<dynamic>? ?? [])
+          .cast<String>()
+          .toList(),
     );
   }
 
@@ -63,6 +68,7 @@ class User {
       'sellingProducts': sellingProducts.map((e) => e.toJson()).toList(),
       'paymentMethods': paymentMethods.map((e) => e.toJson()).toList(),
       'deliveryMethods': deliveryMethods.map((e) => e.toJson()).toList(),
+      'likedProductIds': likedProductIds,
     };
   }
 }
@@ -78,6 +84,7 @@ extension UserCopy on User {
     String? address,
     List<PaymentMethod>? paymentMethods,
     List<DeliveryMethod>? deliveryMethods,
+    List<String>? likedProductIds,
   }) {
     return User(
       userId: userId,
@@ -90,6 +97,7 @@ extension UserCopy on User {
       address: address ?? this.address,
       paymentMethods: paymentMethods ?? this.paymentMethods,
       deliveryMethods: deliveryMethods ?? this.deliveryMethods,
+      likedProductIds: likedProductIds ?? this.likedProductIds
     );
   }
 }

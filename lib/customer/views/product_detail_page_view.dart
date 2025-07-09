@@ -19,6 +19,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   bool isLiked = false;
   int currentImageIndex = 0;
   late Future<User?> _sellerFuture;
+  late Future<User?> _currentUserFuture;
 
   UserDatabaseSource get _userDb => Get.find<UserDatabaseSource>();
 
@@ -29,6 +30,27 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     _sellerFuture = product != null
         ? _userDb.getUserById(product!.userId)
         : Future.value(null);
+    _currentUserFuture = _userDb.getCurrentUser();
+    _checkIfLiked();
+  }
+
+  void _checkIfLiked() async {
+    if (product != null) {
+      try {
+        final liked = await _userDb.isLiked(product!.id);
+        if (mounted) {
+          setState(() {
+            isLiked = liked;
+          });
+        }
+      } catch (error) {
+        if (mounted) {
+          setState(() {
+            isLiked = false;
+          });
+        }
+      }
+    }
   }
 
   String _formatDate(DateTime date) {
@@ -42,10 +64,33 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     return 1;
   }
 
-  void _toggleLike() {
-    setState(() {
-      isLiked = !isLiked;
-    }); 
+  void _toggleLike() async {
+    if (product == null) return;
+
+    try {
+      if (isLiked) {
+        await _userDb.removeLike(product!.id);
+      } else {
+        await _userDb.addLike(product!.id);
+      }
+      
+      final actualLikeStatus = await _userDb.isLiked(product!.id);
+      
+      setState(() {
+        isLiked = actualLikeStatus;
+      });
+    } catch (error) {
+      Get.snackbar(
+        '오류',
+        '좋아요 처리 중 오류가 발생했습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  bool _isCurrentUserSeller(User? currentUser) {
+    if (currentUser == null || product == null) return false;
+    return currentUser.userId == product!.userId;
   }
 
   @override
@@ -160,7 +205,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,12 +258,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                 ),
                               )).toList(),
                             ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
 
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: AppColors.white,
                               borderRadius: BorderRadius.circular(8),
@@ -241,7 +286,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                   color: Color(0xFF616161),
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 12),
                               Text(
                                 (product != null && product!.description.isNotEmpty) 
                                     ? product!.description
@@ -254,7 +299,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                 ),
                               ),
 
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 16),
                               
                               Align(
                                 alignment: Alignment.centerRight,
@@ -276,57 +321,72 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
+                      
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: _toggleLike,
-                              child: AnimatedContainer(duration: Duration(milliseconds: 200),
-                              width: 60,
-                              height: 60,
-                              child: Icon(
-                                isLiked ? AppIcons.heartEnabled : AppIcons.heart,
-                                color: isLiked ? AppColors.logo: AppColors.gray,
-                                size: 42,
-                              )
-                            ),
-                          ),
-
-                          const SizedBox(width: 16),
-
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Get.to(
-                                  () => const CustomerPageView(),
-                                  arguments: product,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                        child: FutureBuilder<User?>(
+                          future: _currentUserFuture,
+                          builder: (context, snapshot) {
+                            final currentUser = snapshot.data;
+                            final isSeller = _isCurrentUserSeller(currentUser);
+                            
+                            return Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: _toggleLike,
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 200),
+                                    width: 60,
+                                    height: 60,
+                                    child: Icon(
+                                      isLiked ? AppIcons.heartEnabled : AppIcons.heart,
+                                      color: isLiked ? AppColors.logo: AppColors.gray,
+                                      size: 42,
+                                    )
+                                  ),
                                 ),
-                                maximumSize: Size(double.infinity, 49),
-                                minimumSize: Size(double.infinity, 49),
-                              ),
-                              child: const Text(
-                                'BUY NOW !',
-                                style: TextStyle(
-                                  fontFamily: 'Rubik',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.white,
+
+                                const SizedBox(width: 16),
+
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: isSeller ? null : () {
+                                      Get.to(
+                                        () => const CustomerPageView(),
+                                        arguments: product,
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isSeller 
+                                          ? AppColors.gray 
+                                          : AppColors.primary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      maximumSize: Size(double.infinity, 49),
+                                      minimumSize: Size(double.infinity, 49),
+                                    ),
+                                    child: Text(
+                                      isSeller ? '내 상품입니다' : 'BUY NOW !',
+                                      style: TextStyle(
+                                        fontFamily: 'Rubik',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: isSeller 
+                                            ? AppColors.darkGray 
+                                            : AppColors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        ],
+                              ],
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 32),
+                    
+                    const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -340,7 +400,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
   Widget _buildSellerInfoOverlay() {
   return Positioned(
-    top: 16,
+    bottom: 16,
     left: 16,
     right: 16,
     child: FutureBuilder<User?>(
@@ -355,61 +415,68 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           return const SizedBox.shrink();
         }
 
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Colors.black.withAlpha(140), 
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: AppColors.white,
-                backgroundImage: seller.profileImageUrl.isNotEmpty
-                    ? NetworkImage(seller.profileImageUrl)
-                    : null,
-                child: seller.profileImageUrl.isEmpty
-                    ? Icon(
-                        AppIcons.profile,
-                        color: AppColors.iconGray,
-                        size: 24,
-                      )
-                    : null,
+        return Align(
+          alignment: Alignment.bottomRight,
+          child: IntrinsicWidth(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(140), 
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      seller.nickname,
-                      style: const TextStyle(
-                        fontFamily: 'Rubik',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.white,
-                      ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(height: 4),
-                    Row(
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: AppColors.transparent,
+                      backgroundImage: seller.profileImageUrl.isNotEmpty
+                          ? NetworkImage(seller.profileImageUrl)
+                          : null,
+                      child: seller.profileImageUrl.isEmpty
+                          ? Icon(
+                              AppIcons.profile,
+                              color: AppColors.iconGray,
+                              size: 24,
+                            )
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
+                        Text(
+                          seller.nickname,
+                          style: const TextStyle(
+                            fontFamily: 'Rubik',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.iconGray,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
                         Text(
                           seller.location.isNotEmpty ? seller.location : product?.location ?? '',
                           style: const TextStyle(
                             fontFamily: 'Rubik',
-                            fontSize: 14, 
+                            fontSize: 12, 
                             fontWeight: FontWeight.w400,
-                            color: AppColors.gray,
+                            color: AppColors.iconGray,
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
